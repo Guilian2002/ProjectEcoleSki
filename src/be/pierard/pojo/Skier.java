@@ -22,7 +22,10 @@ public class Skier extends Person {
 		super(id, lastname, firstname, age, address, email);
 		this.insurance = insurance;
 		this.level = level;
-		this.bookingList = bookingList;
+		if(bookingList.isEmpty())
+			this.bookingList = new ArrayList<Booking>();
+		else
+			this.bookingList = bookingList;
 	}
 
 	//Getters/Setters
@@ -49,6 +52,12 @@ public class Skier extends Person {
 	public void setBookingList(ArrayList<Booking> bookingList) {
 		this.bookingList = bookingList;
 	}
+	
+	//Business methods
+	@Override
+	public String getRole() {
+		return "Skier";
+	}
 
 	//Usual methods
 	@Override
@@ -58,6 +67,18 @@ public class Skier extends Person {
 		result = prime * result + Objects.hash(insurance, level);
 		return result;
 	}
+	
+	public String getLessonTypeFromLevel(ArrayList<Accreditation> accreditationList) {
+        if (level == null || level.isEmpty()) {
+            throw new IllegalArgumentException("Le niveau du Skier ne peut pas être vide.");
+        }
+        for (Accreditation accreditation : accreditationList) {
+            if (level.startsWith(accreditation.getName())) {
+                return level.substring(accreditation.getName().length()).trim();
+            }
+        }
+        throw new IllegalArgumentException("Aucune accréditation ne correspond au niveau : " + level);
+    }
 
 	@Override
 	public boolean equals(Object obj) {

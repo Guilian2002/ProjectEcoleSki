@@ -2,6 +2,7 @@ package be.pierard.pojo;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
@@ -32,7 +33,10 @@ public class Accreditation {
 			ArrayList<LessonType> lessonTypeList) {
 		this.id = id;
 		this.name = name;
-		this.instructorList = instructorList;
+		if(instructorList.isEmpty())
+			this.instructorList = new ArrayList<Instructor>();
+		else
+			this.instructorList = instructorList;
 		if(!lessonTypeList.isEmpty())
 			this.lessonTypeList = lessonTypeList;
 		else {
@@ -72,6 +76,11 @@ public class Accreditation {
 		this.lessonTypeList = lessonTypeList;
 	}
 	
+	//Business methods
+	public boolean isInstructorAccreditedForLesson(LessonType lessonType) {
+	    return lessonType.getLevel().equalsIgnoreCase(name);
+	}
+	
 	//Usual methods
 	@Override
 	public int hashCode() {
@@ -94,8 +103,10 @@ public class Accreditation {
 		return "Accreditation {" +
 	            "id=" + id +
 	            ", name='" + name + '\'' +
-	            ", instructorList=" + (instructorList != null ? instructorList.toString() : "[]") +
-	            ", lessonTypeList=" + (lessonTypeList != null ? lessonTypeList.toString() : "[]") +
+	            ", instructorList=" + (instructorList != null ? 
+	            		instructorList.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") +
+	            ", lessonTypeList=" + (lessonTypeList != null ? 
+	            		lessonTypeList.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") +
 	            '}';
 	}
 }

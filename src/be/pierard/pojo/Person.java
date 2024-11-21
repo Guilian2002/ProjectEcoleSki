@@ -15,7 +15,10 @@ public abstract class Person {
 	    this.id = id;
 	    this.lastname = validateString(lastname, "lastname");
 	    this.firstname = validateString(firstname, "firstname");
-	    this.age = age;
+	    if(age >= 2)
+	    	this.age = age;
+	    else
+	    	throw new IllegalArgumentException("Le champ age doit être supérieur ou égal à 2.");
 	    this.address = validateString(address, "address");
 	    this.email = validateString(email,"email");
 	}
@@ -58,7 +61,9 @@ public abstract class Person {
 		this.email = email;
 	}
 	
-	//Methods
+	//Business Methods
+	public abstract String getRole();
+	
 	private String validateString(String value, String fieldName) {
 	    if (value == null || value.trim().isEmpty()) {
 	        throw new IllegalArgumentException("Le champ " + fieldName + " ne doit pas être vide ou nul.");
