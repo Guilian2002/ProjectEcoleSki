@@ -1,6 +1,7 @@
 package be.pierard.pojo;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ public class Accreditation {
     private ArrayList<LessonType> lessonTypeList;
     
     //CTOR
+    public Accreditation() {}
     public Accreditation(int id, String name, ArrayList<LessonType> lessonTypeList) {
     	this.id = id;
 		this.name = name;
@@ -79,6 +81,29 @@ public class Accreditation {
 	//Business methods
 	public boolean isInstructorAccreditedForLesson(LessonType lessonType) {
 	    return lessonType.getLevel().equalsIgnoreCase(name);
+	}
+	
+	public void addLessonType(LessonType lessonType) {
+        if (!lessonTypeList.contains(lessonType)) {
+            lessonTypeList.add(lessonType);
+        }
+    }
+	
+	//DAO methods
+	public static Accreditation createIfAbsent(Map<Integer, Accreditation> accreditationMap, 
+            int id, String name, LessonType lessonType) {
+		Accreditation accreditation = accreditationMap.get(id);
+		if (accreditation == null) {
+			ArrayList<LessonType> lessonTypeList = new ArrayList<>();
+			lessonTypeList.add(lessonType);
+			accreditation = new Accreditation(id, name, lessonTypeList);
+			accreditation.lessonTypeList.getFirst().setAccreditation(accreditation);
+			accreditationMap.put(id, accreditation);
+		} else {
+			lessonType.setAccreditation(accreditation);
+			accreditation.addLessonType(lessonType);
+		}
+		return accreditation;
 	}
 	
 	//Usual methods

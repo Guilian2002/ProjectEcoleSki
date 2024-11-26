@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
+import be.pierard.dao.LessonDAO;
 
 public class Lesson {
 	private int id;
@@ -130,6 +131,19 @@ public class Lesson {
 	public boolean isBookingValidForLesson(Booking booking) {
 	    int newGroupSize = this.getCurrentBookingsNumber() + booking.getGroupSize();
 	    return newGroupSize >= minBookings && newGroupSize <= maxBookings;
+	}
+	
+	//DAO methods
+	public boolean createLesson(LessonDAO lessonDAO) {
+		return lessonDAO.create(this);
+	}
+	
+	public boolean updateLesson(LessonDAO lessonDAO) {
+		return lessonDAO.update(this);
+	}
+	
+	public static ArrayList<Lesson> findAllLesson(LessonDAO lessonDAO){
+		return lessonDAO.findAll();
 	}
 
 	//Usual methods

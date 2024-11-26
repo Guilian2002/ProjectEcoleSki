@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.swing.JOptionPane;
+import be.pierard.dao.InstructorDAO;
 
 public class Instructor extends Person{
 	private boolean isAvailable;
@@ -116,6 +116,25 @@ public class Instructor extends Person{
 	        }
 	    }
 	    return isAvailable;
+	}
+	
+	public void addAccreditation(Accreditation accreditation) {
+        if (!accreditationList.contains(accreditation)) {
+            accreditationList.add(accreditation);
+        }
+    }
+	
+	//DAO methods
+	public boolean createInstructor(InstructorDAO instructorDAO) {
+		return instructorDAO.create(this);
+	}
+	
+	public boolean updateInstructor(InstructorDAO instructorDAO) {
+		return instructorDAO.update(this);
+	}
+	
+	public static ArrayList<Instructor> findAllInstructor(InstructorDAO instructorDAO){
+		return instructorDAO.findAll();
 	}
 
 	//Usual methods

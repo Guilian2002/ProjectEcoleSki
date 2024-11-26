@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import be.pierard.dao.PeriodDAO;
 
 public class Period {
 	private int id;
@@ -81,6 +82,19 @@ public class Period {
 
 	public boolean isDuringVacation(LocalDate date) {
 	    return isVacation && isDateWithinPeriod(date);
+	}
+	
+	//DAO methods
+	public boolean createPeriod(PeriodDAO periodDAO) {
+		return periodDAO.create(this);
+	}
+	
+	public boolean updatePeriod(PeriodDAO periodDAO) {
+		return periodDAO.update(this);
+	}
+	
+	public static ArrayList<Period> findAllPeriod(PeriodDAO periodDAO){
+		return periodDAO.findAll();
 	}
 
 	//Usual methods

@@ -1,9 +1,12 @@
 package be.pierard.pojo;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Objects;
 
 import javax.swing.JOptionPane;
+
+import be.pierard.dao.BookingDAO;
 
 public class Booking {
 	private int id;
@@ -112,6 +115,14 @@ public class Booking {
 	public void setGroupSize(int groupSize) {
 		this.groupSize = groupSize;
 	}
+	
+	public boolean isSpecial() {
+		return isSpecial;
+	}
+
+	public void setSpecial(boolean isSpecial) {
+		this.isSpecial = isSpecial;
+	}
 
 	public Instructor getInstructor() {
 		return instructor;
@@ -186,6 +197,19 @@ public class Booking {
         }
 
 	    return totalPrice;
+	}
+	
+	//DAO methods
+	public boolean createBooking(BookingDAO bookingDAO) {
+		return bookingDAO.create(this);
+	}
+	
+	public boolean updateBooking(BookingDAO bookingDAO) {
+		return bookingDAO.update(this);
+	}
+	
+	public static ArrayList<Booking> findAllBookings(BookingDAO bookingDAO){
+		return bookingDAO.findAll();
 	}
 	
 	//Usual methods

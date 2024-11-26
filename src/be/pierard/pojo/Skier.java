@@ -2,6 +2,7 @@ package be.pierard.pojo;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import be.pierard.dao.SkierDAO;
 
 public class Skier extends Person {
 	private boolean insurance;
@@ -57,6 +58,19 @@ public class Skier extends Person {
 	@Override
 	public String getRole() {
 		return "Skier";
+	}
+	
+	//DAO methods
+	public boolean createSkier(SkierDAO skierDAO) {
+		return skierDAO.create(this);
+	}
+	
+	public boolean updateSkier(SkierDAO skierDAO) {
+		return skierDAO.update(this);
+	}
+	
+	public static ArrayList<Skier> findAllSkier(SkierDAO skierDAO){
+		return skierDAO.findAll();
 	}
 
 	//Usual methods

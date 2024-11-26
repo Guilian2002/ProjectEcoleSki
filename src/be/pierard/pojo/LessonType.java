@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
+import be.pierard.dao.LessonTypeDAO;
 
 public class LessonType {
 	private int id;
@@ -14,6 +15,7 @@ public class LessonType {
 	private ArrayList<Lesson> lessonList;
 	
 	//CTOR
+	public LessonType() {}
 	public LessonType(int id, String level, double price, Accreditation accreditation,
 			ArrayList<Lesson> lessonList) {
 		this.id = id;
@@ -83,7 +85,7 @@ public class LessonType {
 		return accreditation;
 	}
 
-	public void setAccreditationList(Accreditation accreditation) {
+	public void setAccreditation(Accreditation accreditation) {
 		this.accreditation = accreditation;
 	}
 
@@ -98,6 +100,19 @@ public class LessonType {
 	//Business methods
 	public String getFullLevel() {
 		return "Level: " + accreditation.getName()+ " " + level + ", Price: " + price + "€/week";
+	}
+	
+	//DAO methods
+	public boolean createLessonType(LessonTypeDAO lessonTypeDAO) {
+		return lessonTypeDAO.create(this);
+	}
+	
+	public boolean updateLessonType(LessonTypeDAO lessonTypeDAO) {
+		return lessonTypeDAO.update(this);
+	}
+	
+	public static ArrayList<LessonType> findAllLessonType(LessonTypeDAO lessonTypeDAO){
+		return lessonTypeDAO.findAll();
 	}
 
 	//Usual methods
