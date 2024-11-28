@@ -64,7 +64,7 @@ public class Skier extends Person {
 	}
 	
 	public boolean makeSkier(SkierDAO skierDAO, boolean isUpdate) {
-	    if (!dataVerification() && !ageVerification()) {
+	    if (!dataVerification()) {
 	        JOptionPane.showMessageDialog(null, "Error: Invalid skier data. Please check and try again.",
 	                "Data Validation Error", JOptionPane.ERROR_MESSAGE);
 	        return false;
@@ -92,22 +92,31 @@ public class Skier extends Person {
 	
 	@Override
     public boolean dataVerification() {
-        return baseDataVerification() && Accreditation.levelVerification(String.valueOf(level));
+        return baseDataVerification() && Accreditation.levelVerification(String.valueOf(level)) && ageVerification();
     }
 	
 	public boolean ageVerification() {
-		if(level.toLowerCase().contains("enfant ski") && (getAge() >= 4 && getAge() <=12)) {
-			return true;
-		}
-		if(level.toLowerCase().contains("enfant snowboard") && (getAge() >= 6 && getAge() <=12)) {
-			return true;
-		}
-		if((level.toLowerCase().contains("ski adulte") || level.toLowerCase().contains("snowboard") 
-				|| level.toLowerCase().contains("télémark") || level.toLowerCase().contains("ski de fond")) && getAge() > 12) {
-			return true;
-		}
-		return false;
+	    if (level == null) {
+	        return false;
+	    }
+
+	    String levelLower = level.toLowerCase();
+	    int age = getAge();
+
+	    if (levelLower.contains("enfants ski")) {
+	        return age >= 4 && age <= 12;
+	    } 
+	    else if (levelLower.contains("enfants snowboard")) {
+	        return age >= 6 && age <= 12;
+	    } 
+	    else if (levelLower.contains("ski adulte") || levelLower.contains("snowboard") ||
+	        levelLower.contains("télémark") || levelLower.contains("ski de fond")) {
+	        return age > 12;
+	    }
+	    else
+	    	return false;
 	}
+
 	
 	//DAO methods
 	public boolean createSkier(SkierDAO skierDAO) {
