@@ -1,6 +1,9 @@
 package be.pierard.pojo;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
+
+import javax.swing.JOptionPane;
 
 public abstract class Person {
 	private int id;
@@ -15,10 +18,17 @@ public abstract class Person {
 	    this.id = id;
 	    this.lastname = validateString(lastname, "lastname");
 	    this.firstname = validateString(firstname, "firstname");
-	    if(age >= 2)
+	    if(age >= 4)
 	    	this.age = age;
-	    else
-	    	throw new IllegalArgumentException("Le champ age doit être supérieur ou égal à 2.");
+	    else {
+	    	JOptionPane.showMessageDialog(
+	                null,
+	                "Age must be higher or equals to 4.",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE
+	            );
+			throw new IllegalArgumentException();
+	    }
 	    this.address = validateString(address, "address");
 	    this.email = validateString(email,"email");
 	}
@@ -66,10 +76,27 @@ public abstract class Person {
 	
 	private String validateString(String value, String fieldName) {
 	    if (value == null || value.trim().isEmpty()) {
-	        throw new IllegalArgumentException("Le champ " + fieldName + " ne doit pas être vide ou nul.");
+	    	JOptionPane.showMessageDialog(
+	                null,
+	                fieldName + " must not be empty.",
+	                "Error",
+	                JOptionPane.ERROR_MESSAGE
+	            );
+			throw new IllegalArgumentException();
 	    }
 	    return value;
 	}
+	
+	public abstract boolean dataVerification();
+
+    protected boolean baseDataVerification() {
+        return firstname != null && !firstname.isEmpty() &&
+               lastname != null && !lastname.isEmpty() &&
+               Pattern.matches("^[a-zA-ZÀ-ÖØ-öø-ÿ'\\- ]{1,32}$", firstname) &&
+               Pattern.matches("^[a-zA-ZÀ-ÖØ-öø-ÿ'\\- ]{1,32}$", lastname) &&
+               address != null && address.length() < 512 &&
+               email != null && email.length() < 255;
+    }
 	
 	//Usual methods
 	@Override
@@ -92,12 +119,11 @@ public abstract class Person {
 	@Override
 	public String toString() {
 	    return "Person {" +
-	            "id=" + id +
-	            ", lastname='" + lastname + '\'' +
-	            ", firstname='" + firstname + '\'' +
-	            ", age=" + age +
-	            ", address='" + address + '\'' +
-	            ", email='" + email + '\'' +
+	            "lastname = " + lastname +
+	            ", firstname = " + firstname +
+	            ", age = " + age +
+	            ", address = " + address +
+	            ", email = " + email +
 	            '}';
 	}
 	

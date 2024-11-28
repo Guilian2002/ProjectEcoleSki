@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 import javax.swing.JOptionPane;
 
+import be.pierard.dao.AccreditationDAO;
+import be.pierard.dao.EcoleSkiConnection;
+
 public class Accreditation {
     private int id;
     private String name;
@@ -24,7 +27,7 @@ public class Accreditation {
 		else {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "La liste de type de leçons pour les accreditations ne doit pas être vide.",
+	                "Lessons types list must not be empty.",
 	                "Erreur",
 	                JOptionPane.ERROR_MESSAGE
 	            );
@@ -79,14 +82,18 @@ public class Accreditation {
 	}
 	
 	//Business methods
-	public boolean isInstructorAccreditedForLesson(LessonType lessonType) {
-	    return lessonType.getLevel().equalsIgnoreCase(name);
-	}
-	
 	public void addLessonType(LessonType lessonType) {
         if (!lessonTypeList.contains(lessonType)) {
             lessonTypeList.add(lessonType);
         }
+    }
+	
+	public static boolean levelVerification(String level) {
+        AccreditationDAO accreditationDAO = new AccreditationDAO(EcoleSkiConnection.getInstance());
+        ArrayList<Accreditation> allAccreditations = findAllAccreditation(accreditationDAO);
+        return allAccreditations.stream()
+                .flatMap(accreditation -> accreditation.lessonTypeList.stream())
+                .anyMatch(lessonType -> lessonType.getFullLevel().equals(level));
     }
 	
 	//DAO methods
@@ -104,6 +111,18 @@ public class Accreditation {
 			accreditation.addLessonType(lessonType);
 		}
 		return accreditation;
+	}
+	
+	public boolean createAccreditation(AccreditationDAO accreditationDAO) {
+		return accreditationDAO.create(this);
+	}
+	
+	public boolean updateAccreditation(AccreditationDAO accreditationDAO) {
+		return accreditationDAO.update(this);
+	}
+	
+	public static ArrayList<Accreditation> findAllAccreditation(AccreditationDAO accreditationDAO){
+		return accreditationDAO.findAll();
 	}
 	
 	//Usual methods
@@ -126,12 +145,9 @@ public class Accreditation {
 	@Override
 	public String toString() {
 		return "Accreditation {" +
-	            "id=" + id +
-	            ", name='" + name + '\'' +
-	            ", instructorList=" + (instructorList != null ? 
-	            		instructorList.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") +
-	            ", lessonTypeList=" + (lessonTypeList != null ? 
-	            		lessonTypeList.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") +
+	            "name = " + name +
+	            ", lessonTypeList = " + (lessonTypeList != null ? 
+	            		lessonTypeList.stream().map(LessonType::getLevel).collect(Collectors.joining(", ", "[", "]")) : "[]") +
 	            '}';
 	}
 }

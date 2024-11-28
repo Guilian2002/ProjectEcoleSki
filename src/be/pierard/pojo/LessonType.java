@@ -2,8 +2,6 @@ package be.pierard.pojo;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
 import javax.swing.JOptionPane;
 import be.pierard.dao.LessonTypeDAO;
 
@@ -24,7 +22,7 @@ public class LessonType {
 		if(accreditation.equals(null)) {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "l'accreditation ne doit pas être vide.",
+	                "Accreditation must not be empty.",
 	                "Erreur",
 	                JOptionPane.ERROR_MESSAGE
 	            );
@@ -45,7 +43,7 @@ public class LessonType {
 		if(accreditation.equals(null)) {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "l'accreditation ne doit pas être vide.",
+	                "Accreditation must not be empty.",
 	                "Erreur",
 	                JOptionPane.ERROR_MESSAGE
 	            );
@@ -99,7 +97,7 @@ public class LessonType {
 	
 	//Business methods
 	public String getFullLevel() {
-		return "Level: " + accreditation.getName()+ " " + level + ", Price: " + price + "€/week";
+		return accreditation.getName()+ " " + level;
 	}
 	
 	//DAO methods
@@ -138,12 +136,8 @@ public class LessonType {
 	@Override
 	public String toString() {
 		return "LessonType {" +
-				"id=" + id + 
-				", level=" + level + 
-				", price=" + price + 
-				", accreditation=" + accreditation + 
-				", lessonList=" + (lessonList != null ?
-						lessonList.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") + 
+				"level = " + this.getFullLevel() + 
+				", price = " + price + 
 				"}";
 	}
 }

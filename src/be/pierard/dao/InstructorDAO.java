@@ -18,15 +18,14 @@ public class InstructorDAO extends DAO<Instructor>{
 	}
 	
 	public boolean create(Instructor obj){		
-		String sql = "INSERT INTO Instructor (Lastname, Firstname, Age, Address, Email, IsAvailable, HourlyRate) VALUES (?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO Instructor (Lastname, Firstname, Age, Address, Email, HourlyRate) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connect.prepareStatement(sql)) {
             stmt.setString(1, obj.getLastname());
             stmt.setString(2, obj.getFirstname());
             stmt.setInt(3, obj.getAge());
             stmt.setString(4, obj.getAddress());
             stmt.setString(5, obj.getEmail());
-            stmt.setBoolean(6, obj.isAvailable());
-            stmt.setDouble(7, obj.getHourlyRate());
+            stmt.setDouble(6, obj.getHourlyRate());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -39,16 +38,15 @@ public class InstructorDAO extends DAO<Instructor>{
 	}
 	
 	public boolean update(Instructor obj){
-		String sql = "UPDATE Instructor SET Lastname = ?, Firstname = ?, Age = ?, Address = ?, Email = ?, IsAvailable = ?, HourlyRate = ? WHERE InstructorId = ?";
+		String sql = "UPDATE Instructor SET Lastname = ?, Firstname = ?, Age = ?, Address = ?, Email = ?, HourlyRate = ? WHERE InstructorId = ?";
         try (PreparedStatement stmt = connect.prepareStatement(sql)) {
             stmt.setString(1, obj.getLastname());
             stmt.setString(2, obj.getFirstname());
             stmt.setInt(3, obj.getAge());
             stmt.setString(4, obj.getAddress());
             stmt.setString(5, obj.getEmail());
-            stmt.setBoolean(6, obj.isAvailable());
-            stmt.setDouble(7, obj.getHourlyRate());
-            stmt.setInt(8, obj.getId());
+            stmt.setDouble(6, obj.getHourlyRate());
+            stmt.setInt(7, obj.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -92,7 +90,6 @@ public class InstructorDAO extends DAO<Instructor>{
                     int age = rs.getInt("Age");
                     String address = rs.getString("Address");
                     String email = rs.getString("Email");
-                    boolean isAvailable = rs.getBoolean("IsAvailable");
                     double hourlyRate = rs.getDouble("HourlyRate");
                     
                     Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> {
@@ -102,8 +99,7 @@ public class InstructorDAO extends DAO<Instructor>{
                             firstname, 
                             age, 
                             address, 
-                            email, 
-                            isAvailable, 
+                            email,
                             hourlyRate, 
                             new ArrayList<Accreditation>()
                         );

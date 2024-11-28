@@ -1,9 +1,12 @@
 package be.pierard.pojo;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import javax.swing.JOptionPane;
+
 import be.pierard.dao.PeriodDAO;
 
 public class Period {
@@ -80,9 +83,66 @@ public class Period {
 	           (date.isEqual(endDate) || date.isBefore(endDate));
 	}
 
-	public boolean isDuringVacation(LocalDate date) {
-	    return isVacation && isDateWithinPeriod(date);
+	private boolean isDuringVacation(LocalDate date) {
+		ArrayList<Period> vacationPeriods = new ArrayList<>();
+        vacationPeriods.add(new Period(1, LocalDate.of(2024, 12, 21), LocalDate.of(2025, 1, 4), true));
+        vacationPeriods.add(new Period(2, LocalDate.of(2025, 3, 1), LocalDate.of(2025, 3, 8), true));
+        vacationPeriods.add(new Period(3, LocalDate.of(2025, 4, 12), LocalDate.of(2025, 4, 26), true));
+        return vacationPeriods.stream()
+                .anyMatch(period -> !date.isBefore(period.getStartDate()) && !date.isAfter(period.getEndDate()));
+    }
+	
+	public boolean makePeriod(PeriodDAO periodDAO, boolean isUpdate) {
+		LocalDate stationOpenDate = LocalDate.of(2024, 12, 6);
+        LocalDate stationCloseDate = LocalDate.of(2025, 5, 3);
+        
+        if (!isDateWithinStationPeriod(stationOpenDate, stationCloseDate)) {
+        	JOptionPane.showMessageDialog(null, "Error: Period startDate or endDate is not within station open/close date.",
+		               "Date Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        this.isVacation = isDuringVacation(startDate) && isDuringVacation(endDate);
+        
+        if(isUpdate) {
+        	if (!updatePeriod(periodDAO)) {
+      	       JOptionPane.showMessageDialog(null, "Error: Failed to save period data to the database.",
+      	               "Database Error", JOptionPane.ERROR_MESSAGE);
+      	       return false;
+      		}
+      		JOptionPane.showMessageDialog(
+      			null,
+      			"Success: The period has been successfully updated.",
+      			"Operation Successful",
+      			JOptionPane.INFORMATION_MESSAGE
+      		);
+        }
+        else {
+        	if (!createPeriod(periodDAO)) {
+     	       JOptionPane.showMessageDialog(null, "Error: Failed to save period data to the database.",
+     	               "Database Error", JOptionPane.ERROR_MESSAGE);
+     	       return false;
+     		}
+     		JOptionPane.showMessageDialog(
+     			null,
+     			"Success: The period has been successfully created.",
+     			"Operation Successful",
+     			JOptionPane.INFORMATION_MESSAGE
+     		);
+        }
+        return true;
+    }
+	
+	public int getNumberOfDays() {
+	    return (int) ChronoUnit.DAYS.between(startDate, endDate);
 	}
+	
+	public int getNumberOfWeeks() {
+	    return (int) Math.ceil(getNumberOfDays() / 7.0);
+	}
+	
+	private boolean isDateWithinStationPeriod(LocalDate stationOpenDate, LocalDate stationCloseDate) {
+        return !(startDate.isBefore(stationOpenDate) || endDate.isAfter(stationCloseDate));
+    }
 	
 	//DAO methods
 	public boolean createPeriod(PeriodDAO periodDAO) {
@@ -119,12 +179,21 @@ public class Period {
 	@Override
 	public String toString() {
 		return "Period {" + 
-				"id=" + id + 
-				", startDate=" + startDate + 
-				", endDate=" + endDate + 
-				", isVacation=" + (isVacation ? "yes" : "no") +
-				", bookingList=" + (bookingList != null ?
-						bookingList.stream().map(Object::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") + 
+				"startDate =" + startDate + 
+				", endDate =" + endDate + 
+				", isVacation =" + (isVacation ? "yes" : "no") +
 				"}";
+	}
+
+	public boolean isWithinOneWeek() {
+		LocalDate currentDate = LocalDate.now();
+	    LocalDate oneWeekLater = currentDate.plusWeeks(1);
+	    return this.getStartDate().isBefore(oneWeekLater);
+	}
+
+	public boolean isWithinOneMonth() {
+		LocalDate currentDate = LocalDate.now();
+	    LocalDate oneMonthLater = currentDate.plusMonths(1);
+	    return this.getStartDate().isBefore(oneMonthLater);
 	}
 }

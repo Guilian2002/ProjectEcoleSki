@@ -2,10 +2,13 @@ package be.pierard.pojo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-
+import java.util.Set;
 import javax.swing.JOptionPane;
-
 import be.pierard.dao.BookingDAO;
 
 public class Booking {
@@ -32,8 +35,8 @@ public class Booking {
 		if(instructor.equals(null)) {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "l'instructeur ne doit pas être vide.",
-	                "Erreur",
+	                "Instructor must not be empty.",
+	                "Error",
 	                JOptionPane.ERROR_MESSAGE
 	            );
 			throw new IllegalArgumentException();
@@ -43,8 +46,8 @@ public class Booking {
 		if(lesson.equals(null)) {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "la leçon ne doit pas être vide.",
-	                "Erreur",
+	                "Lesson must not be empty.",
+	                "Error",
 	                JOptionPane.ERROR_MESSAGE
 	            );
 			throw new IllegalArgumentException();
@@ -54,8 +57,8 @@ public class Booking {
 		if(period.equals(null)) {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "la période ne doit pas être vide.",
-	                "Erreur",
+	                "Period must not be empty.",
+	                "Error",
 	                JOptionPane.ERROR_MESSAGE
 	            );
 			throw new IllegalArgumentException();
@@ -65,8 +68,8 @@ public class Booking {
 		if(skier.equals(null)) {
 			JOptionPane.showMessageDialog(
 	                null,
-	                "le skieur ne doit pas être vide.",
-	                "Erreur",
+	                "Skier must not be empty.",
+	                "Error",
 	                JOptionPane.ERROR_MESSAGE
 	            );
 			throw new IllegalArgumentException();
@@ -158,45 +161,128 @@ public class Booking {
 	
 	//Business methods
 	public double calculatePrice() {
-	    double totalPrice = 0.0;
-	    double basePrice = lesson.getLessonPrice();
-	    int totalWeeks = (int) Math.ceil((double) duration / 7);
+	    double basePrice = 0.0;
+	    int totalDays = period.getNumberOfDays();
+	    double instructorRate = instructor.getHourlyRate();
+	    int currentBookingNumber = lesson.getCurrentBookingsNumber();
+	    boolean hasInsurance = skier.isInsurance();
 
-	    if (isSpecial) {
-	        if (duration == 1) {
-	            basePrice = 60.0;
-	        } else if (duration == 2) {
-	            basePrice = 90.0;
-	        } else {
-	            throw new IllegalArgumentException("Durée de cours particulier invalide.");
-	        }
-	        if (period.isDuringVacation(date)) {
-	            if (date.isBefore(LocalDate.now().plusWeeks(1))) {
-	                throw new IllegalArgumentException("Cours particulier : réservation 1 semaine à l'avance requise en période scolaire.");
-	            }
-	        } else {
-	            if (date.isBefore(LocalDate.now().plusMonths(1))) {
-	                throw new IllegalArgumentException("Cours particulier : réservation 1 mois à l'avance requise hors période scolaire.");
-	            }
-	        }
-	        totalPrice = basePrice * groupSize;
+	    if (isSpecial()) {
+	        int totalHours = calculateTotalHoursSpecial(totalDays);
+
+	        basePrice = ((totalHours * instructorRate) / currentBookingNumber)
+	                     + (hasInsurance ? 20 : 0)
+	                     + (totalDays * lesson.getLessonPrice());
 
 	    } else {
-	        if (!lesson.isBookingValidForLesson(this)) {
-	            throw new IllegalArgumentException("Nombre d'élèves non conforme pour un cours collectif.");
-	        }
+	        int totalWeeks = period.getNumberOfWeeks();
+	        int totalHours = calculateTotalHoursGroup();
 
-	        totalPrice = basePrice;
+	        basePrice = ((lesson.getLessonPrice() * totalWeeks)
+	                    + (hasInsurance ? 20 : 0)
+	                    + ((totalHours * instructorRate) / currentBookingNumber));
 
-	        if (lesson.getSchedule().equalsIgnoreCase("matin+après-midi")) {
-	            totalPrice *= 0.85;
+	        if (lesson.getSchedule().contains("morning+afternoon")) {
+	            basePrice /= 0.85;
 	        }
 	    }
-        if (skier.isInsurance()) {
-            totalPrice += 20.0 * totalWeeks;
-        }
+	    
+	    if (period.isVacation()) {
+	        basePrice *= 1.5;
+	    }
 
-	    return totalPrice;
+	    return basePrice;
+	}
+	
+	public boolean dataVerification() {
+		return lesson.isBookingValidForLesson(this) && instructor.isAvailable(period, lesson) && this.isSpecialCanBookForLater();
+	}
+	
+	public static void addBookingsToObjects(ArrayList<Booking> bookingList) {
+		Map<Instructor, List<Booking>> instructorBookings = new HashMap<>();
+	    Map<Skier, List<Booking>> skierBookings = new HashMap<>();
+	    Map<Lesson, List<Booking>> lessonBookings = new HashMap<>();
+	    Map<Period, List<Booking>> periodBookings = new HashMap<>();
+
+	    for (Booking booking : bookingList) {
+	        instructorBookings
+	            .computeIfAbsent(booking.getInstructor(), k -> booking.getInstructor().getBookingList())
+	            .add(booking);
+
+	        skierBookings
+	            .computeIfAbsent(booking.getSkier(), k -> booking.getSkier().getBookingList())
+	            .add(booking);
+
+	        lessonBookings
+	            .computeIfAbsent(booking.getLesson(), k -> booking.getLesson().getBookingList())
+	            .add(booking);
+
+	        periodBookings
+	            .computeIfAbsent(booking.getPeriod(), k -> booking.getPeriod().getBookingList())
+	            .add(booking);
+	    }
+	}
+	
+	public boolean makeBooking(BookingDAO bookingDAO, boolean isUpdate) {
+		if (!dataVerification()) {
+	        JOptionPane.showMessageDialog(null, "Error: Invalid booking data. Please check and try again.",
+	                "Data Validation Error", JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
+		this.setPrice(this.calculatePrice());
+		this.setDuration(period.getNumberOfDays());
+		this.setDate(LocalDate.now());
+		if(isUpdate) {
+		    if (!updateBooking(bookingDAO)) {
+		        JOptionPane.showMessageDialog(null, "Error: Failed to save booking data to the database.",
+		                "Database Error", JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    JOptionPane.showMessageDialog(null, "Success: Booking has been successfully updated!",
+		            "Operation Successful", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+		    if (!createBooking(bookingDAO)) {
+		        JOptionPane.showMessageDialog(null, "Error: Failed to save booking data to the database.",
+		                "Database Error", JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    JOptionPane.showMessageDialog(null, "Success: Booking has been successfully created!",
+		            "Operation Successful", JOptionPane.INFORMATION_MESSAGE);
+		}
+		return true;
+	}
+	
+	private int calculateTotalHoursSpecial(int totalDays) {
+	    int hoursPerDay = 0;
+
+	    if (lesson.getSchedule().contains("noon 1/2")) {
+	        hoursPerDay = 1;
+	    } else if (lesson.getSchedule().contains("noon 2/2")) {
+	        hoursPerDay = 2;
+	    }
+
+	    return totalDays * hoursPerDay;
+	}
+	
+	private int calculateTotalHoursGroup() {
+	    if (lesson.getSchedule().contains("morning+afternoon")) {
+	        return 6 * 6 + 3; 
+	    } else {
+	        return 7 * 3;
+	    }
+	}
+	
+	private boolean isSpecialCanBookForLater() {
+		if(isSpecial()) {
+			if (period.isVacation() && !period.isWithinOneWeek()) {
+			    return false;
+			}
+			if (!period.isVacation() && !period.isWithinOneMonth()) {
+			    return false;
+			}
+		}
+		return true;
 	}
 	
 	//DAO methods
@@ -210,6 +296,16 @@ public class Booking {
 	
 	public static ArrayList<Booking> findAllBookings(BookingDAO bookingDAO){
 		return bookingDAO.findAll();
+	}
+	
+	public static void linkEntities(ArrayList<Booking> bookingList) {
+	    addBookingsToObjects(bookingList);
+	    Set<Lesson> lessonSet = new HashSet<>();
+	    for (Booking booking : bookingList) {
+	        lessonSet.add(booking.getLesson());
+	    }
+	    ArrayList<Lesson> lessonList = new ArrayList<>(lessonSet);
+	    Lesson.addLessonsToInstructors(lessonList);
 	}
 	
 	//Usual methods
@@ -237,15 +333,13 @@ public class Booking {
 	@Override
 	public String toString() {
 		return "Booking {" + 
-				"id=" + id + 
-				", date=" + date + 
-				", duration=" + duration + 
-				", price=" + price + 
-				", groupSize=" + groupSize + 
-				", instructor=" + instructor + 
-				", lesson=" + lesson + 
-				", period=" + period + 
-				", skier=" + skier + 
+				"date = " + date + 
+				", duration = " + duration + 
+				", price = " + price + 
+				", groupSize = " + groupSize +  
+				", lesson = " + lesson + 
+				", period = " + period + 
+				", skier = " + skier.getFirstname() + " " + skier.getLastname() + 
 				"}";
 	}
 

@@ -88,9 +88,8 @@ public class LessonDAO extends DAO<Lesson>{
                    int age = rs.getInt("Age");
                    String address = rs.getString("Address");
                    String email = rs.getString("Email");
-                   boolean isAvailable = rs.getBoolean("IsAvailable");
                    double hourlyRate = rs.getDouble("HourlyRate");
-	               Instructor instructor = new Instructor(instructorId, lastname, firstname, age, address, email, isAvailable, hourlyRate, new ArrayList<>());
+	               Instructor instructor = new Instructor(instructorId, lastname, firstname, age, address, email, hourlyRate, new ArrayList<>());
 	               Lesson lesson = new Lesson(lessonId, minBookings, maxBookings, schedule, lessonType, instructor);
 
 	               lessonList.add(lesson);

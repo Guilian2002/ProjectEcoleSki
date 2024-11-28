@@ -2,6 +2,9 @@ package be.pierard.pojo;
 
 import java.util.ArrayList;
 import java.util.Objects;
+
+import javax.swing.JOptionPane;
+
 import be.pierard.dao.SkierDAO;
 
 public class Skier extends Person {
@@ -60,6 +63,52 @@ public class Skier extends Person {
 		return "Skier";
 	}
 	
+	public boolean makeSkier(SkierDAO skierDAO, boolean isUpdate) {
+	    if (!dataVerification() && !ageVerification()) {
+	        JOptionPane.showMessageDialog(null, "Error: Invalid skier data. Please check and try again.",
+	                "Data Validation Error", JOptionPane.ERROR_MESSAGE);
+	        return false;
+	    }
+	    if(isUpdate) {
+		    if (!updateSkier(skierDAO)) {
+		        JOptionPane.showMessageDialog(null, "Error: Failed to save skier data to the database.",
+		                "Database Error", JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    JOptionPane.showMessageDialog(null, "Success: Skier has been successfully updated!",
+		            "Operation Successful", JOptionPane.INFORMATION_MESSAGE);
+	    }
+	    else {
+		    if (!createSkier(skierDAO)) {
+		        JOptionPane.showMessageDialog(null, "Error: Failed to save skier data to the database.",
+		                "Database Error", JOptionPane.ERROR_MESSAGE);
+		        return false;
+		    }
+		    JOptionPane.showMessageDialog(null, "Success: Skier has been successfully created!",
+		            "Operation Successful", JOptionPane.INFORMATION_MESSAGE);
+	    }
+	    return true;
+	}
+	
+	@Override
+    public boolean dataVerification() {
+        return baseDataVerification() && Accreditation.levelVerification(String.valueOf(level));
+    }
+	
+	public boolean ageVerification() {
+		if(level.toLowerCase().contains("enfant ski") && (getAge() >= 4 && getAge() <=12)) {
+			return true;
+		}
+		if(level.toLowerCase().contains("enfant snowboard") && (getAge() >= 6 && getAge() <=12)) {
+			return true;
+		}
+		if((level.toLowerCase().contains("ski adulte") || level.toLowerCase().contains("snowboard") 
+				|| level.toLowerCase().contains("télémark") || level.toLowerCase().contains("ski de fond")) && getAge() > 12) {
+			return true;
+		}
+		return false;
+	}
+	
 	//DAO methods
 	public boolean createSkier(SkierDAO skierDAO) {
 		return skierDAO.create(this);
@@ -109,14 +158,13 @@ public class Skier extends Person {
 	@Override
 	public String toString() {
 		return "Skier {" +
-	            "id=" + getId() +
-	            ", lastname='" + getLastname() + '\'' +
-	            ", firstname='" + getFirstname() + '\'' +
-	            ", age=" + getAge() +
-	            ", address='" + getAddress() + '\'' +
-	            ", email='" + getEmail() + '\'' +
-	            ", insurance=" + (insurance ? "yes" : "no") +
-	            ", level='" + level + '\'' +
+	            "lastname = " + getLastname() +
+	            ", firstname = " + getFirstname() +
+	            ", age = " + getAge() +
+	            ", address = " + getAddress() +
+	            ", email = " + getEmail() +
+	            ", insurance = " + (insurance ? "yes" : "no") +
+	            ", level = " + level +
 	            '}';
 	}
 }

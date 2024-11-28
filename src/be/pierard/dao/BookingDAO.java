@@ -99,7 +99,6 @@ public class BookingDAO extends DAO<Booking>{
 	                int instructorAge = rs.getInt("Age");
 	                String instructorAddress = rs.getString("Address");
 	                String instructorEmail = rs.getString("Email");
-	                boolean instructorAvailable = rs.getBoolean("IsAvailable");
 	                double instructorHourlyRate = rs.getDouble("HourlyRate");
 
 	                int skierId = rs.getInt("SkierId");
@@ -137,7 +136,7 @@ public class BookingDAO extends DAO<Booking>{
 
 	                Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> new Instructor(
 	                    id, instructorLastname, instructorFirstname, instructorAge, instructorAddress, instructorEmail,
-	                    instructorAvailable, instructorHourlyRate, new ArrayList<>()
+	                    instructorHourlyRate, new ArrayList<>()
 	                ));
 
 	                Skier skier = skierMap.computeIfAbsent(skierId, id -> new Skier(
@@ -163,6 +162,7 @@ public class BookingDAO extends DAO<Booking>{
 	                period.getBookingList().add(booking);
 	                bookings.add(booking);
 	            }
+	            Booking.linkEntities(bookings);
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
