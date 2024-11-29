@@ -14,14 +14,16 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import be.pierard.dao.EcoleSkiConnection;
+import be.pierard.dao.SkierDAO;
+
 public class Home extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
 
-    /**
-     * Launch the application.
-     */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -35,9 +37,6 @@ public class Home extends JFrame {
         });
     }
 
-    /**
-     * Create the frame.
-     */
     public Home() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 800, 600);
@@ -55,14 +54,31 @@ public class Home extends JFrame {
         panelSkier.setLayout(new GridBagLayout());
         contentPane.add(panelSkier, BorderLayout.CENTER);
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+
         JButton btnAddSkier = new JButton("Add a Skier");
         btnAddSkier.setFont(new Font("Arial", Font.PLAIN, 18));
         btnAddSkier.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	dispose();
+                dispose();
                 new AddSkier().setVisible(true);
             }
         });
-        panelSkier.add(btnAddSkier);
+        panelSkier.add(btnAddSkier, gbc);
+
+        gbc.gridy = 1;
+        JButton btnShowAllSkiers = new JButton("Show All Skiers");
+        btnShowAllSkiers.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnShowAllSkiers.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance())).setVisible(true);
+            }
+        });
+        panelSkier.add(btnShowAllSkiers, gbc);
     }
 }
+
