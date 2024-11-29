@@ -6,14 +6,12 @@ import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import be.pierard.dao.EcoleSkiConnection;
@@ -45,19 +43,30 @@ public class Home extends JFrame {
         contentPane.setLayout(new BorderLayout(10, 10));
         setContentPane(contentPane);
 
+        // Title Label
         JLabel lblTitle = new JLabel("Welcome to the Ski Management System", JLabel.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
         contentPane.add(lblTitle, BorderLayout.NORTH);
 
-        JPanel panelSkier = new JPanel();
-        panelSkier.setBorder(BorderFactory.createTitledBorder("Skier"));
-        panelSkier.setLayout(new GridBagLayout());
-        contentPane.add(panelSkier, BorderLayout.CENTER);
-
+        // Main panels for Skier and Period
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.gridx = 0;
         gbc.gridy = 0;
+        contentPane.add(mainPanel, BorderLayout.CENTER);
+
+        // Skier Panel
+        JPanel panelSkier = new JPanel();
+        panelSkier.setBorder(BorderFactory.createTitledBorder("Skier"));
+        panelSkier.setLayout(new GridBagLayout());
+        mainPanel.add(panelSkier, gbc);
+
+        GridBagConstraints skierGbc = new GridBagConstraints();
+        skierGbc.insets = new Insets(10, 10, 10, 10);
+        skierGbc.gridx = 0;
+        skierGbc.gridy = 0;
 
         JButton btnAddSkier = new JButton("Add a Skier");
         btnAddSkier.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -67,9 +76,9 @@ public class Home extends JFrame {
                 new AddSkier().setVisible(true);
             }
         });
-        panelSkier.add(btnAddSkier, gbc);
+        panelSkier.add(btnAddSkier, skierGbc);
 
-        gbc.gridy = 1;
+        skierGbc.gridy = 1;
         JButton btnShowAllSkiers = new JButton("Show All Skiers");
         btnShowAllSkiers.setFont(new Font("Arial", Font.PLAIN, 18));
         btnShowAllSkiers.addActionListener(new ActionListener() {
@@ -78,7 +87,29 @@ public class Home extends JFrame {
                 new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance())).setVisible(true);
             }
         });
-        panelSkier.add(btnShowAllSkiers, gbc);
+        panelSkier.add(btnShowAllSkiers, skierGbc);
+
+        // Period Panel
+        gbc.gridx = 1;  // Move the "Period" panel to the right of the "Skier" panel
+        gbc.gridy = 0;
+        JPanel panelPeriod = new JPanel();
+        panelPeriod.setBorder(BorderFactory.createTitledBorder("Period"));
+        panelPeriod.setLayout(new GridBagLayout());
+        mainPanel.add(panelPeriod, gbc);
+
+        GridBagConstraints periodGbc = new GridBagConstraints();
+        periodGbc.insets = new Insets(10, 10, 10, 10);
+        periodGbc.gridx = 0;
+        periodGbc.gridy = 0;
+
+        JButton btnAddPeriod = new JButton("Add a Period");
+        btnAddPeriod.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnAddPeriod.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new AddPeriod().setVisible(true);
+            }
+        });
+        panelPeriod.add(btnAddPeriod, periodGbc);
     }
 }
-
