@@ -66,15 +66,17 @@ public class BookingDAO extends DAO<Booking>{
 
 	public ArrayList<Booking> findAll() {
 	    ArrayList<Booking> bookings = new ArrayList<>();
-	    String sql = "SELECT b.*, l.*, i.*, lt.*, a.*, ia.*, s.*, p.* " +
+	    String sql = "SELECT b.*, l.*, i.*, lt.*, a.*, ia.*, s.*, p.*, asub.*, ltsub.* " +
 	                 "FROM Booking b " +
 	                 "INNER JOIN Lesson l ON l.LessonId = b.LessonId_FK " +
 	                 "INNER JOIN Instructor i ON i.InstructorId = l.InstructorId_FK " +
 	                 "INNER JOIN LessonType lt ON lt.LessonTypeId = l.LessonTypeId_FK " +
-	                 "LEFT JOIN InstructorAccreditation ia ON ia.InstructorId_FK = i.InstructorId " +
-	                 "LEFT JOIN Accreditation a ON a.AccreditationId = lt.AccreditationId_FK " +
+	                 "INNER JOIN InstructorAccreditation ia ON ia.InstructorId_FK = i.InstructorId " +
+	                 "INNER JOIN Accreditation a ON a.AccreditationId = lt.AccreditationId_FK " +
 	                 "INNER JOIN Skier s ON s.SkierId = b.SkierId_FK " +
-	                 "INNER JOIN Period p ON p.PeriodId = b.PeriodId_FK";
+	                 "INNER JOIN Period p ON p.PeriodId = b.PeriodId_FK" +
+	                 "INNER JOIN Accreditation asub ON ia.AccreditationId_FK = asub.AccreditationId " +
+                     "INNER JOIN LessonType ltsub ON ltsub.AccreditationId_FK = a.AccreditationId and ltsub.level = ia.level";
 
 	    try (PreparedStatement stmt = connect.prepareStatement(sql)) {
 	        try (ResultSet rs = stmt.executeQuery()) {
@@ -86,12 +88,12 @@ public class BookingDAO extends DAO<Booking>{
 	            Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 
 	            while (rs.next()) {
-	                int lessonTypeId = rs.getInt("LessonTypeId");
-	                String lessonLevel = rs.getString("Level");
-	                double lessonPrice = rs.getDouble("Price");
+	                int lessonTypeId = rs.getInt("lt.LessonTypeId");
+	                String lessonLevel = rs.getString("lt.Level");
+	                double lessonPrice = rs.getDouble("lt.Price");
 
-	                int accreditationId = rs.getInt("AccreditationId");
-	                String accreditationName = rs.getString("AccreditationName");
+	                int accreditationId = rs.getInt("a.AccreditationId");
+	                String accreditationName = rs.getString("a.AccreditationName");
 
 	                int instructorId = rs.getInt("InstructorId");
 	                String instructorLastname = rs.getString("Lastname");
@@ -133,10 +135,25 @@ public class BookingDAO extends DAO<Booking>{
 
 	                LessonType lessonType = lessonTypeMap.computeIfAbsent(lessonTypeId, id -> new LessonType(
 	                    id, lessonLevel, lessonPrice, accreditation));
+	                
+	                LessonType lessonType2 = new LessonType();
+	                   lessonType2.setId(rs.getInt("ltsub.LessonTypeId"));
+	                   lessonType2.setLevel(rs.getString("ltsub.Level"));
+	                   lessonType2.setPrice(rs.getDouble("ltsub.Price"));
+	                   
+	                   Accreditation accreditation2 = Accreditation.createIfAbsent(
+	                       accreditationMap, 
+	                       rs.getInt("asub.AccreditationId"), 
+	                       rs.getString("asub.AccreditationName"), 
+	                       lessonType
+	                   );
+	                   
+	                   ArrayList<Accreditation> accreditationList = new ArrayList<>();
+	                   accreditationList.add(accreditation2);
 
 	                Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> new Instructor(
 	                    id, instructorLastname, instructorFirstname, instructorAge, instructorAddress, instructorEmail,
-	                    instructorHourlyRate, new ArrayList<>()
+	                    instructorHourlyRate, accreditationList
 	                ));
 
 	                Skier skier = skierMap.computeIfAbsent(skierId, id -> new Skier(

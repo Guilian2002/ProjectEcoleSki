@@ -83,7 +83,10 @@ public class InstructorDAO extends DAO<Instructor>{
                         rs.getString("AccreditationName"), 
                         lessonType
                     );
-
+                    
+                    ArrayList<Accreditation> accreditationList = new ArrayList<>();
+                    accreditationList.add(accreditation);
+                    
                     int instructorId = rs.getInt("InstructorId");
                     String lastname = rs.getString("Lastname");
                     String firstname = rs.getString("Firstname");
@@ -92,7 +95,8 @@ public class InstructorDAO extends DAO<Instructor>{
                     String email = rs.getString("Email");
                     double hourlyRate = rs.getDouble("HourlyRate");
                     
-                    Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> {
+                    
+                    instructorMap.computeIfAbsent(instructorId, id -> {
                         return new Instructor(
                             id, 
                             lastname, 
@@ -101,11 +105,9 @@ public class InstructorDAO extends DAO<Instructor>{
                             address, 
                             email,
                             hourlyRate, 
-                            new ArrayList<Accreditation>()
+                            accreditationList
                         );
                     });
-
-                    instructor.addAccreditation(accreditation);
                 }
 
                 instructors.addAll(instructorMap.values());

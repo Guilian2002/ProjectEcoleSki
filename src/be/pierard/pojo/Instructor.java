@@ -29,7 +29,6 @@ public class Instructor extends Person{
 		this.accreditationList = accreditationList;
 		this.bookingList = new ArrayList<Booking>();
 		this.lessonList = new ArrayList<Lesson>();
-		System.out.println("Accreditation List: " + accreditationList);
 	}
 
 	public Instructor(int id, String lastname, String firstname, int age, String address, String email,
