@@ -75,7 +75,7 @@ public class Home extends JFrame {
         btnShowAllSkiers.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance())).setVisible(true);
+                new SelectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance())).setVisible(true);
             }
         });
         panelSkier.add(btnShowAllSkiers, gbc);
