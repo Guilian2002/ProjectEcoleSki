@@ -13,7 +13,7 @@ import be.pierard.pojo.Skier;
 import be.pierard.dao.EcoleSkiConnection;
 import be.pierard.dao.SkierDAO;
 
-public class selectAllSkier extends JFrame {
+public class SelectAllSkier extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
@@ -21,14 +21,11 @@ public class selectAllSkier extends JFrame {
     private JTextField searchField;
     private SkierDAO skierDAO;
 
-    /**
-     * Launch the application.
-     */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    selectAllSkier frame = new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance()));
+                    SelectAllSkier frame = new SelectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance()));
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -37,10 +34,7 @@ public class selectAllSkier extends JFrame {
         });
     }
 
-    /**
-     * Create the frame.
-     */
-    public selectAllSkier(SkierDAO skierDAO) {
+    public SelectAllSkier(SkierDAO skierDAO) {
         this.skierDAO = skierDAO;
         setTitle("All Skiers");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,7 +44,6 @@ public class selectAllSkier extends JFrame {
         setContentPane(contentPane);
         contentPane.setLayout(null);
 
-        // Table and TableModel setup
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(10, 50, 760, 250);
         contentPane.add(scrollPane);
@@ -92,6 +85,24 @@ public class selectAllSkier extends JFrame {
                 new Home().setVisible(true);
             }
         });
+
+        JButton updateSkierButton = new JButton("Update Skier");
+        updateSkierButton.setBounds(10, 320, 150, 30);
+        contentPane.add(updateSkierButton);
+        updateSkierButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Please select a skier to update.");
+                } else {
+                    Skier selectedSkier = getSelectedSkier(selectedRow);
+                    if (selectedSkier != null) {
+                        dispose();
+                        new UpdateSkier(selectedSkier, skierDAO).setVisible(true);
+                    }
+                }
+            }
+        });
     }
 
     private void populateTable(ArrayList<Skier> skiers) {
@@ -118,5 +129,16 @@ public class selectAllSkier extends JFrame {
                         || (skier.isInsurance() ? "yes" : "no").contains(query))
                 .collect(Collectors.toCollection(ArrayList::new));
         populateTable(filteredSkiers);
+    }
+
+    private Skier getSelectedSkier(int row) {
+        String lastname = (String) table.getValueAt(row, 0);
+        String firstname = (String) table.getValueAt(row, 1);
+
+        ArrayList<Skier> skiers = Skier.findAllSkier(skierDAO);
+        return skiers.stream()
+                .filter(skier -> skier.getLastname().equals(lastname) && skier.getFirstname().equals(firstname))
+                .findFirst()
+                .orElse(null);
     }
 }
