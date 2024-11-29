@@ -147,7 +147,7 @@ public class Home extends JFrame {
         btnShowAllInstructors.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new SeeAllInstructors().setVisible(true);  // Ouvre la fenêtre SeeAllInstructors
+                new SeeAllInstructors().setVisible(true);
             }
         });
         panelInstructor.add(btnShowAllInstructors, instructorGbc);
