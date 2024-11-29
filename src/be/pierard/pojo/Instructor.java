@@ -1,6 +1,7 @@
 package be.pierard.pojo;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
@@ -13,6 +14,7 @@ public class Instructor extends Person{
 	private ArrayList<Booking> bookingList;
 	
 	//CTOR
+	public Instructor() {}
 	public Instructor(int id, String lastname, String firstname, int age, String address, String email,
 			double hourlyRate, ArrayList<Accreditation> accreditationList) {
 		super(id, lastname, firstname, age, address, email);
@@ -29,6 +31,8 @@ public class Instructor extends Person{
 		this.accreditationList = accreditationList;
 		this.bookingList = new ArrayList<Booking>();
 		this.lessonList = new ArrayList<Lesson>();
+		
+		System.out.println(this.toString() + accreditationList);
 	}
 
 	public Instructor(int id, String lastname, String firstname, int age, String address, String email,
@@ -176,6 +180,15 @@ public class Instructor extends Person{
 	    }
 	    return true;
 	}
+	
+	
+	public static void filterInstructorsWithAccreditations(Map<Integer, Instructor> instructorMap, ArrayList<Instructor> instructors) {
+	    for (Instructor instructor : instructorMap.values()) {
+	        if (!instructor.getAccreditationList().isEmpty()) {
+	            instructors.add(instructor);
+	        }
+	    }
+	}
 
 	private boolean doPeriodsOverlap(Period period1, Period period2) {
 	    return (period1.getStartDate().isBefore(period2.getEndDate()) && 
@@ -242,7 +255,7 @@ public class Instructor extends Person{
 		        ", email = " + getEmail() +
 				", hourlyRate = " + hourlyRate + 
 				", accreditationList = " + (accreditationList != null ?
-						accreditationList.stream().map(Accreditation::toString).collect(Collectors.joining(", ", "[", "]")) : "[]") + 
+						accreditationList.stream().map(Accreditation::toString).collect(Collectors.joining(",\n", "[\n", "\n]")) : "[]") + 
 				"}";
 	}
 	
