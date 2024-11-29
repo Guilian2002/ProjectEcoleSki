@@ -26,7 +26,7 @@ public class UpdateSkier extends JFrame {
         if (this.skier == null) {
             JOptionPane.showMessageDialog(null, "No skier selected.", "Error", JOptionPane.ERROR_MESSAGE);
             dispose();
-            new SelectAllSkier(skierDAO).setVisible(true);
+            new selectAllSkier(skierDAO).setVisible(true);
             return;
         }
 
@@ -78,7 +78,7 @@ public class UpdateSkier extends JFrame {
         JButton btnGoBack = new JButton("Go Back");
         btnGoBack.addActionListener(e -> {
             dispose();
-            new SelectAllSkier(skierDAO).setVisible(true);
+            new selectAllSkier(skierDAO).setVisible(true);
         });
         contentPane.add(btnGoBack);
     }

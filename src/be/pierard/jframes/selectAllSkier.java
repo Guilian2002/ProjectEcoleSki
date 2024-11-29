@@ -13,7 +13,7 @@ import be.pierard.pojo.Skier;
 import be.pierard.dao.EcoleSkiConnection;
 import be.pierard.dao.SkierDAO;
 
-public class SelectAllSkier extends JFrame {
+public class selectAllSkier extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
@@ -25,7 +25,7 @@ public class SelectAllSkier extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    SelectAllSkier frame = new SelectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance()));
+                    selectAllSkier frame = new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance()));
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -34,7 +34,7 @@ public class SelectAllSkier extends JFrame {
         });
     }
 
-    public SelectAllSkier(SkierDAO skierDAO) {
+    public selectAllSkier(SkierDAO skierDAO) {
         this.skierDAO = skierDAO;
         setTitle("All Skiers");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,6 +99,25 @@ public class SelectAllSkier extends JFrame {
                     if (selectedSkier != null) {
                         dispose();
                         new UpdateSkier(selectedSkier, skierDAO).setVisible(true);
+                    }
+                }
+            }
+        });
+
+        // Nouveau bouton "Show Details"
+        JButton showDetailsButton = new JButton("Show Details");
+        showDetailsButton.setBounds(180, 320, 150, 30);
+        contentPane.add(showDetailsButton);
+        showDetailsButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow == -1) {
+                    JOptionPane.showMessageDialog(null, "Please select a skier to view details.");
+                } else {
+                    Skier selectedSkier = getSelectedSkier(selectedRow);
+                    if (selectedSkier != null) {
+                        JOptionPane.showMessageDialog(null, selectedSkier.toString(), 
+                                "Skier Details", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
             }
