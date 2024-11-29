@@ -17,9 +17,7 @@ public class Instructor extends Person{
 			double hourlyRate, ArrayList<Accreditation> accreditationList) {
 		super(id, lastname, firstname, age, address, email);
 		this.hourlyRate = hourlyRate;
-		if(!accreditationList.isEmpty())
-			this.accreditationList = accreditationList;
-		else {
+		if (accreditationList == null || accreditationList.isEmpty()) {
 			JOptionPane.showMessageDialog(
 	                null,
 	                "Accreditation list must not be empty.",
@@ -31,6 +29,7 @@ public class Instructor extends Person{
 		this.accreditationList = accreditationList;
 		this.bookingList = new ArrayList<Booking>();
 		this.lessonList = new ArrayList<Lesson>();
+		System.out.println("Accreditation List: " + accreditationList);
 	}
 
 	public Instructor(int id, String lastname, String firstname, int age, String address, String email,
@@ -139,6 +138,17 @@ public class Instructor extends Person{
 		                "Database Error", JOptionPane.ERROR_MESSAGE);
 		        return false;
 		    }
+	    	int id = findInstructorLastCorrespondingId(instructorDAO, getLastname(),getFirstname(), getAge(), 
+	    			getAddress(), getEmail(), getHourlyRate());
+	    	
+	    	if (id == -1) {
+    	        JOptionPane.showMessageDialog(null, "Error: Failed to retrieve instructor data from the database.",
+    	                "Database Error", JOptionPane.ERROR_MESSAGE);
+    	        return false;
+    	    }
+	    	
+	    	this.setId(id);
+	    	
 		    for(Accreditation accreditation : accreditationList) {
 		    	for(LessonType lessonType : accreditation.getLessonTypeList()) {
 		    		if (!createInstructorAccreditation(instructorDAO, accreditation.getId(), lessonType.getLevel())) {
@@ -192,6 +202,11 @@ public class Instructor extends Person{
 	
 	public static ArrayList<Instructor> findAllInstructor(InstructorDAO instructorDAO){
 		return instructorDAO.findAll();
+	}
+	
+	public static int findInstructorLastCorrespondingId(InstructorDAO instructorDAO, String lastname, 
+			String firstname, int age, String address, String email, double hourlyRate){
+		return instructorDAO.findInstructorLastCorrespondingId(lastname, firstname, age, address, email, hourlyRate);
 	}
 
 	//Usual methods

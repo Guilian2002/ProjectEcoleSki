@@ -142,4 +142,30 @@ public class InstructorDAO extends DAO<Instructor>{
             return false;
         }
 	}
+	
+	public int findInstructorLastCorrespondingId(String lastname, String firstname, int age,
+			String address, String email, double hourlyRate) {
+	    String sql = "SELECT InstructorId FROM Instructor WHERE " +
+	                 "Lastname = ? AND Firstname = ? AND Age = ? AND Address = ? AND Email = ? AND HourlyRate = ? " +
+	                 "ORDER BY InstructorId DESC LIMIT 1";
+	    int instructorId = -1;
+	    try (PreparedStatement stmt = connect.prepareStatement(sql)) {
+	        stmt.setString(1, lastname);
+	        stmt.setString(2, firstname);
+	        stmt.setInt(3, age);
+	        stmt.setString(4, address);
+	        stmt.setString(5, email);
+	        stmt.setDouble(6, hourlyRate);
+	        
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            if (rs.next()) {
+	                instructorId = rs.getInt("InstructorId");
+	            }
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return instructorId;
+	}
 }
