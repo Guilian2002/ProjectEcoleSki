@@ -140,5 +140,16 @@ public class Home extends JFrame {
             }
         });
         panelInstructor.add(btnAddInstructor, instructorGbc);
+
+        instructorGbc.gridy = 1;
+        JButton btnShowAllInstructors = new JButton("Show All Instructors");
+        btnShowAllInstructors.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnShowAllInstructors.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new SeeAllInstructors().setVisible(true);  // Ouvre la fenêtre SeeAllInstructors
+            }
+        });
+        panelInstructor.add(btnShowAllInstructors, instructorGbc);
     }
 }

@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import be.pierard.pojo.*;
 
@@ -55,41 +57,59 @@ public class LessonDAO extends DAO<Lesson>{
 	public ArrayList<Lesson> findAll() {
 	    ArrayList<Lesson> lessonList = new ArrayList<>();
 
-	    String sql = "SELECT l.*, lt.*, i.*, a.* " +
+	    String sql = "SELECT l.*, lt.*, i.*, a.*, asub.*, ltsub.* " +
 	                 "FROM Lesson l " +
 	                 "INNER JOIN Instructor i ON l.InstructorId_FK = i.InstructorId " +
 	                 "INNER JOIN LessonType lt ON l.LessonTypeId_FK = lt.LessonTypeId " +
-	                 "INNER JOIN Accreditation a ON lt.AccreditationId_FK = a.AccreditationId";
+	                 "INNER JOIN Accreditation a ON lt.AccreditationId_FK = a.AccreditationId" +
+	                 "INNER JOIN InstructorAccreditation ia ON i.InstructorId = ia.InstructorId_FK " +
+                     "INNER JOIN Accreditation asub ON ia.AccreditationId_FK = asub.AccreditationId " +
+                     "INNER JOIN LessonType ltsub ON ltsub.AccreditationId_FK = a.AccreditationId and ltsub.level = ia.level";
 	    
 	    try (PreparedStatement stmt = connect.prepareStatement(sql);
 	            ResultSet rs = stmt.executeQuery()) {
-
+	        Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 	           while (rs.next()) {
-	               int lessonId = rs.getInt("LessonId");
-	               int minBookings = rs.getInt("MinBookings");
-	               int maxBookings = rs.getInt("MaxBookings");
-	               String schedule = rs.getString("Schedule");
+	               int lessonId = rs.getInt("l.LessonId");
+	               int minBookings = rs.getInt("l.MinBookings");
+	               int maxBookings = rs.getInt("l.MaxBookings");
+	               String schedule = rs.getString("l.Schedule");
 
 	               LessonType lessonType = new LessonType();
-	               lessonType.setId(rs.getInt("LessonTypeId"));
-	               lessonType.setLevel(rs.getString("Level"));
-	               lessonType.setPrice(rs.getDouble("Price"));
+	               lessonType.setId(rs.getInt("lt.LessonTypeId"));
+	               lessonType.setLevel(rs.getString("lt.Level"));
+	               lessonType.setPrice(rs.getDouble("lt.Price"));
 	               
-	               int accreditationId = rs.getInt("AccreditationId");
-	               String accreditationName = rs.getString("Name");
+	               int accreditationId = rs.getInt("a.AccreditationId");
+	               String accreditationName = rs.getString("a.Name");
                    ArrayList<LessonType> lessonTypeList = new ArrayList<>();
                    lessonTypeList.add(lessonType);
                    Accreditation accreditation = new Accreditation(accreditationId, accreditationName, lessonTypeList);
                    lessonType.setAccreditation(accreditation);
+                   
+                   LessonType lessonType2 = new LessonType();
+                   lessonType2.setId(rs.getInt("ltsub.LessonTypeId"));
+                   lessonType2.setLevel(rs.getString("ltsub.Level"));
+                   lessonType2.setPrice(rs.getDouble("ltsub.Price"));
+                   
+                   Accreditation accreditation2 = Accreditation.createIfAbsent(
+                       accreditationMap, 
+                       rs.getInt("asub.AccreditationId"), 
+                       rs.getString("asub.AccreditationName"), 
+                       lessonType
+                   );
+                   
+                   ArrayList<Accreditation> accreditationList = new ArrayList<>();
+                   accreditationList.add(accreditation2);
 
-	               int instructorId = rs.getInt("InstructorId");
-                   String lastname = rs.getString("Lastname");
-                   String firstname = rs.getString("Firstname");
-                   int age = rs.getInt("Age");
-                   String address = rs.getString("Address");
-                   String email = rs.getString("Email");
-                   double hourlyRate = rs.getDouble("HourlyRate");
-	               Instructor instructor = new Instructor(instructorId, lastname, firstname, age, address, email, hourlyRate, new ArrayList<>());
+	               int instructorId = rs.getInt("i.InstructorId");
+                   String lastname = rs.getString("i.Lastname");
+                   String firstname = rs.getString("i.Firstname");
+                   int age = rs.getInt("i.Age");
+                   String address = rs.getString("i.Address");
+                   String email = rs.getString("i.Email");
+                   double hourlyRate = rs.getDouble("i.HourlyRate");
+	               Instructor instructor = new Instructor(instructorId, lastname, firstname, age, address, email, hourlyRate, accreditationList);
 	               Lesson lesson = new Lesson(lessonId, minBookings, maxBookings, schedule, lessonType, instructor);
 
 	               lessonList.add(lesson);
