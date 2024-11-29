@@ -117,7 +117,7 @@ public class AddPeriod extends JFrame {
 
         Period period = new Period(0, startDate, endDate, false);
         PeriodDAO periodDAO = new PeriodDAO(EcoleSkiConnection.getInstance());
-        boolean success = period.makePeriod(periodDAO, false);
+        boolean success = period.makePeriod(periodDAO);
 
         if (!success) {
             JOptionPane.showMessageDialog(this, "Error: Failed to add period.", 

@@ -43,12 +43,9 @@ public class Home extends JFrame {
         contentPane.setLayout(new BorderLayout(10, 10));
         setContentPane(contentPane);
 
-        // Title Label
         JLabel lblTitle = new JLabel("Welcome to the Ski Management System", JLabel.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
         contentPane.add(lblTitle, BorderLayout.NORTH);
-
-        // Main panels for Skier and Period
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -57,7 +54,6 @@ public class Home extends JFrame {
         gbc.gridy = 0;
         contentPane.add(mainPanel, BorderLayout.CENTER);
 
-        // Skier Panel
         JPanel panelSkier = new JPanel();
         panelSkier.setBorder(BorderFactory.createTitledBorder("Skier"));
         panelSkier.setLayout(new GridBagLayout());
@@ -84,13 +80,12 @@ public class Home extends JFrame {
         btnShowAllSkiers.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance())).setVisible(true);
+                new SeeAllSkiers(new SkierDAO(EcoleSkiConnection.getInstance())).setVisible(true);
             }
         });
         panelSkier.add(btnShowAllSkiers, skierGbc);
 
-        // Period Panel
-        gbc.gridx = 1;  // Move the "Period" panel to the right of the "Skier" panel
+        gbc.gridx = 1;
         gbc.gridy = 0;
         JPanel panelPeriod = new JPanel();
         panelPeriod.setBorder(BorderFactory.createTitledBorder("Period"));
@@ -111,5 +106,16 @@ public class Home extends JFrame {
             }
         });
         panelPeriod.add(btnAddPeriod, periodGbc);
+        
+        periodGbc.gridy = 1;
+        JButton btnShowAllPeriods = new JButton("Show All Periods");
+        btnShowAllPeriods.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnShowAllPeriods.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new SeeAllPeriods().setVisible(true);
+            }
+        });
+        panelPeriod.add(btnShowAllPeriods, periodGbc);
     }
 }

@@ -92,7 +92,7 @@ public class Period {
                 .anyMatch(period -> !date.isBefore(period.getStartDate()) && !date.isAfter(period.getEndDate()));
     }
 	
-	public boolean makePeriod(PeriodDAO periodDAO, boolean isUpdate) {
+	public boolean makePeriod(PeriodDAO periodDAO) {
 		LocalDate stationOpenDate = LocalDate.of(2024, 12, 6);
         LocalDate stationCloseDate = LocalDate.of(2025, 5, 3);
         
@@ -102,33 +102,17 @@ public class Period {
             return false;
         }
         this.isVacation = isDuringVacation(startDate) && isDuringVacation(endDate);
-        
-        if(isUpdate) {
-        	if (!updatePeriod(periodDAO)) {
-      	       JOptionPane.showMessageDialog(null, "Error: Failed to save period data to the database.",
-      	               "Database Error", JOptionPane.ERROR_MESSAGE);
-      	       return false;
-      		}
-      		JOptionPane.showMessageDialog(
-      			null,
-      			"Success: The period has been successfully updated.",
-      			"Operation Successful",
-      			JOptionPane.INFORMATION_MESSAGE
-      		);
-        }
-        else {
-        	if (!createPeriod(periodDAO)) {
-     	       JOptionPane.showMessageDialog(null, "Error: Failed to save period data to the database.",
-     	               "Database Error", JOptionPane.ERROR_MESSAGE);
-     	       return false;
-     		}
-     		JOptionPane.showMessageDialog(
-     			null,
-     			"Success: The period has been successfully created.",
-     			"Operation Successful",
-     			JOptionPane.INFORMATION_MESSAGE
-     		);
-        }
+    	if (!createPeriod(periodDAO)) {
+ 	       JOptionPane.showMessageDialog(null, "Error: Failed to save period data to the database.",
+ 	               "Database Error", JOptionPane.ERROR_MESSAGE);
+ 	       return false;
+ 		}
+ 		JOptionPane.showMessageDialog(
+ 			null,
+ 			"Success: The period has been successfully created.",
+ 			"Operation Successful",
+ 			JOptionPane.INFORMATION_MESSAGE
+ 		);
         return true;
     }
 	
@@ -147,10 +131,6 @@ public class Period {
 	//DAO methods
 	public boolean createPeriod(PeriodDAO periodDAO) {
 		return periodDAO.create(this);
-	}
-	
-	public boolean updatePeriod(PeriodDAO periodDAO) {
-		return periodDAO.update(this);
 	}
 	
 	public static ArrayList<Period> findAllPeriod(PeriodDAO periodDAO){
