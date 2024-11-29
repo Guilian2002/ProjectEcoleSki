@@ -13,19 +13,20 @@ import be.pierard.pojo.Skier;
 import be.pierard.dao.EcoleSkiConnection;
 import be.pierard.dao.SkierDAO;
 
-public class selectAllSkier extends JFrame {
+public class SeeAllSkiers extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JPanel contentPane;
     private JTable table;
     private JTextField searchField;
     private SkierDAO skierDAO;
+    private ArrayList<Skier> allSkiers;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    selectAllSkier frame = new selectAllSkier(new SkierDAO(EcoleSkiConnection.getInstance()));
+                    SeeAllSkiers frame = new SeeAllSkiers(new SkierDAO(EcoleSkiConnection.getInstance()));
                     frame.setVisible(true);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -34,7 +35,7 @@ public class selectAllSkier extends JFrame {
         });
     }
 
-    public selectAllSkier(SkierDAO skierDAO) {
+    public SeeAllSkiers(SkierDAO skierDAO) {
         this.skierDAO = skierDAO;
         setTitle("All Skiers");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,7 +56,8 @@ public class selectAllSkier extends JFrame {
         ));
         scrollPane.setViewportView(table);
 
-        populateTable(Skier.findAllSkier(skierDAO));
+        allSkiers = Skier.findAllSkier(skierDAO);
+        populateTable(allSkiers);
 
         searchField = new JTextField();
         searchField.setBounds(10, 10, 200, 30);
@@ -71,7 +73,7 @@ public class selectAllSkier extends JFrame {
                 if (!query.isEmpty()) {
                     searchSkier(query);
                 } else {
-                    populateTable(Skier.findAllSkier(skierDAO));
+                    populateTable(allSkiers);
                 }
             }
         });
@@ -104,7 +106,6 @@ public class selectAllSkier extends JFrame {
             }
         });
 
-        // Nouveau bouton "Show Details"
         JButton showDetailsButton = new JButton("Show Details");
         showDetailsButton.setBounds(180, 320, 150, 30);
         contentPane.add(showDetailsButton);
@@ -116,7 +117,7 @@ public class selectAllSkier extends JFrame {
                 } else {
                     Skier selectedSkier = getSelectedSkier(selectedRow);
                     if (selectedSkier != null) {
-                        JOptionPane.showMessageDialog(null, selectedSkier.toString(), 
+                        JOptionPane.showMessageDialog(null, selectedSkier.toString(),
                                 "Skier Details", JOptionPane.INFORMATION_MESSAGE);
                     }
                 }
@@ -139,8 +140,7 @@ public class selectAllSkier extends JFrame {
     }
 
     private void searchSkier(String query) {
-        ArrayList<Skier> skiers = Skier.findAllSkier(skierDAO);
-        ArrayList<Skier> filteredSkiers = skiers.stream()
+        ArrayList<Skier> filteredSkiers = allSkiers.stream()
                 .filter(skier -> skier.getLastname().toLowerCase().contains(query)
                         || skier.getFirstname().toLowerCase().contains(query)
                         || String.valueOf(skier.getAge()).contains(query)
@@ -154,8 +154,7 @@ public class selectAllSkier extends JFrame {
         String lastname = (String) table.getValueAt(row, 0);
         String firstname = (String) table.getValueAt(row, 1);
 
-        ArrayList<Skier> skiers = Skier.findAllSkier(skierDAO);
-        return skiers.stream()
+        return allSkiers.stream()
                 .filter(skier -> skier.getLastname().equals(lastname) && skier.getFirstname().equals(firstname))
                 .findFirst()
                 .orElse(null);
