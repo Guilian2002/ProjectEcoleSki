@@ -74,9 +74,10 @@ public class BookingDAO extends DAO<Booking>{
 	                 "INNER JOIN InstructorAccreditation ia ON ia.InstructorId_FK = i.InstructorId " +
 	                 "INNER JOIN Accreditation a ON a.AccreditationId = lt.AccreditationId_FK " +
 	                 "INNER JOIN Skier s ON s.SkierId = b.SkierId_FK " +
-	                 "INNER JOIN Period p ON p.PeriodId = b.PeriodId_FK" +
+	                 "INNER JOIN Period p ON p.PeriodId = b.PeriodId_FK " +
 	                 "INNER JOIN Accreditation asub ON ia.AccreditationId_FK = asub.AccreditationId " +
-                     "INNER JOIN LessonType ltsub ON ltsub.AccreditationId_FK = a.AccreditationId and ltsub.level = ia.level";
+	                 "INNER JOIN LessonType ltsub ON ltsub.AccreditationId_FK = a.AccreditationId " +
+	                 "WHERE ltsub.level = ia.level";
 
 	    try (PreparedStatement stmt = connect.prepareStatement(sql)) {
 	        try (ResultSet rs = stmt.executeQuery()) {
@@ -95,6 +96,28 @@ public class BookingDAO extends DAO<Booking>{
 	                int accreditationId = rs.getInt("a.AccreditationId");
 	                String accreditationName = rs.getString("a.AccreditationName");
 
+	                Accreditation accreditation = accreditationId > 0 ? 
+	                    accreditationMap.computeIfAbsent(accreditationId, id -> new Accreditation(
+	                        id, accreditationName, new ArrayList<>())) : null;
+
+	                LessonType lessonType = lessonTypeMap.computeIfAbsent(lessonTypeId, id -> new LessonType(
+	                    id, lessonLevel, lessonPrice, accreditation));
+
+	                LessonType lessonType2 = new LessonType();
+	                lessonType2.setId(rs.getInt("ltsub.LessonTypeId"));
+	                lessonType2.setLevel(rs.getString("ltsub.Level"));
+	                lessonType2.setPrice(rs.getDouble("ltsub.Price"));
+
+	                Accreditation accreditation2 = Accreditation.createIfAbsent(
+	                    accreditationMap, 
+	                    rs.getInt("asub.AccreditationId"), 
+	                    rs.getString("asub.AccreditationName"), 
+	                    lessonType
+	                );
+
+	                ArrayList<Accreditation> accreditationList = new ArrayList<>();
+	                accreditationList.add(accreditation2);
+
 	                int instructorId = rs.getInt("InstructorId");
 	                String instructorLastname = rs.getString("Lastname");
 	                String instructorFirstname = rs.getString("Firstname");
@@ -102,6 +125,21 @@ public class BookingDAO extends DAO<Booking>{
 	                String instructorAddress = rs.getString("Address");
 	                String instructorEmail = rs.getString("Email");
 	                double instructorHourlyRate = rs.getDouble("HourlyRate");
+
+	                Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> {
+	                    Instructor newInstructor = new Instructor();
+	                    newInstructor.setId(instructorId);
+	                    newInstructor.setLastname(instructorLastname);
+	                    newInstructor.setFirstname(instructorFirstname);
+	                    newInstructor.setAge(instructorAge);
+	                    newInstructor.setAddress(instructorAddress);
+	                    newInstructor.setEmail(instructorEmail);
+	                    newInstructor.setHourlyRate(instructorHourlyRate);
+	                    newInstructor.setAccreditationList(new ArrayList<>());
+	                    return newInstructor;
+	                });
+
+	                instructor.addAccreditation(accreditation2);
 
 	                int skierId = rs.getInt("SkierId");
 	                String skierLastname = rs.getString("Lastname");
@@ -129,33 +167,6 @@ public class BookingDAO extends DAO<Booking>{
 	                int bookingGroupSize = rs.getInt("GroupSize");
 	                boolean isSpecial = rs.getBoolean("IsSpecial");
 
-	                Accreditation accreditation = accreditationId > 0 ? 
-	                    accreditationMap.computeIfAbsent(accreditationId, id -> new Accreditation(
-	                        id, accreditationName, new ArrayList<>())) : null;
-
-	                LessonType lessonType = lessonTypeMap.computeIfAbsent(lessonTypeId, id -> new LessonType(
-	                    id, lessonLevel, lessonPrice, accreditation));
-	                
-	                LessonType lessonType2 = new LessonType();
-	                   lessonType2.setId(rs.getInt("ltsub.LessonTypeId"));
-	                   lessonType2.setLevel(rs.getString("ltsub.Level"));
-	                   lessonType2.setPrice(rs.getDouble("ltsub.Price"));
-	                   
-	                   Accreditation accreditation2 = Accreditation.createIfAbsent(
-	                       accreditationMap, 
-	                       rs.getInt("asub.AccreditationId"), 
-	                       rs.getString("asub.AccreditationName"), 
-	                       lessonType
-	                   );
-	                   
-	                   ArrayList<Accreditation> accreditationList = new ArrayList<>();
-	                   accreditationList.add(accreditation2);
-
-	                Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> new Instructor(
-	                    id, instructorLastname, instructorFirstname, instructorAge, instructorAddress, instructorEmail,
-	                    instructorHourlyRate, accreditationList
-	                ));
-
 	                Skier skier = skierMap.computeIfAbsent(skierId, id -> new Skier(
 	                    id, skierLastname, skierFirstname, skierAge, skierAddress, skierEmail, skierInsurance, skierLevel,
 	                    new ArrayList<>()
@@ -177,9 +188,12 @@ public class BookingDAO extends DAO<Booking>{
 	                skier.getBookingList().add(booking);
 	                lesson.getBookingList().add(booking);
 	                period.getBookingList().add(booking);
+
 	                bookings.add(booking);
 	            }
+
 	            Booking.linkEntities(bookings);
+
 	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
@@ -187,6 +201,4 @@ public class BookingDAO extends DAO<Booking>{
 
 	    return bookings;
 	}
-
-
 }

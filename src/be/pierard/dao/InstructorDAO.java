@@ -59,65 +59,63 @@ public class InstructorDAO extends DAO<Instructor>{
 	}
 
 	public ArrayList<Instructor> findAll() {
-		ArrayList<Instructor> instructors = new ArrayList<Instructor>();
-        String sql = "SELECT i.*, a.*, lt.* " +
-                     "FROM Instructor i	 " +
-                     "INNER JOIN InstructorAccreditation ia ON i.InstructorId = ia.InstructorId_FK " +
-                     "INNER JOIN Accreditation a ON ia.AccreditationId_FK = a.AccreditationId " +
-                     "INNER JOIN LessonType lt ON lt.AccreditationId_FK = a.AccreditationId and lt.level = ia.level";
+	    ArrayList<Instructor> instructors = new ArrayList<Instructor>();
+	    String sql = "SELECT i.*, a.*, lt.* " +
+	                 "FROM Instructor i " +
+	                 "INNER JOIN InstructorAccreditation ia ON i.InstructorId = ia.InstructorId_FK " +
+	                 "INNER JOIN Accreditation a ON ia.AccreditationId_FK = a.AccreditationId " +
+	                 "INNER JOIN LessonType lt ON lt.AccreditationId_FK = a.AccreditationId " +
+	                 "WHERE lt.level = ia.level";
 
-        try (PreparedStatement stmt = connect.prepareStatement(sql)) {
-            try (ResultSet rs = stmt.executeQuery()) {
-                Map<Integer, Accreditation> accreditationMap = new HashMap<>();
-                Map<Integer, Instructor> instructorMap = new HashMap<>();
+	    try (PreparedStatement stmt = connect.prepareStatement(sql)) {
+	        try (ResultSet rs = stmt.executeQuery()) {
+	            Map<Integer, Instructor> instructorMap = new HashMap<>();
+	            Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 
-                while (rs.next()) {
-                    LessonType lessonType = new LessonType();
-                    lessonType.setId(rs.getInt("LessonTypeId"));
-                    lessonType.setLevel(rs.getString("Level"));
-                    lessonType.setPrice(rs.getDouble("Price"));
-                    
-                    Accreditation accreditation = Accreditation.createIfAbsent(
-                        accreditationMap, 
-                        rs.getInt("AccreditationId"), 
-                        rs.getString("AccreditationName"), 
-                        lessonType
-                    );
-                    
-                    ArrayList<Accreditation> accreditationList = new ArrayList<>();
-                    accreditationList.add(accreditation);
-                    
-                    int instructorId = rs.getInt("InstructorId");
-                    String lastname = rs.getString("Lastname");
-                    String firstname = rs.getString("Firstname");
-                    int age = rs.getInt("Age");
-                    String address = rs.getString("Address");
-                    String email = rs.getString("Email");
-                    double hourlyRate = rs.getDouble("HourlyRate");
-                    
-                    
-                    instructorMap.computeIfAbsent(instructorId, id -> {
-                        return new Instructor(
-                            id, 
-                            lastname, 
-                            firstname, 
-                            age, 
-                            address, 
-                            email,
-                            hourlyRate, 
-                            accreditationList
-                        );
-                    });
-                }
+	            while (rs.next()) {
+	                LessonType lessonType = new LessonType();
+	                lessonType.setId(rs.getInt("LessonTypeId"));
+	                lessonType.setLevel(rs.getString("Level"));
+	                lessonType.setPrice(rs.getDouble("Price"));
 
-                instructors.addAll(instructorMap.values());
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+	                Accreditation accreditation = Accreditation.createIfAbsent(
+	                    accreditationMap, 
+	                    rs.getInt("AccreditationId"), 
+	                    rs.getString("AccreditationName"), 
+	                    lessonType
+	                );
 
-        return instructors;
+	                int instructorId = rs.getInt("InstructorId");
+	                String lastname = rs.getString("Lastname");
+	                String firstname = rs.getString("Firstname");
+	                int age = rs.getInt("Age");
+	                String address = rs.getString("Address");
+	                String email = rs.getString("Email");
+	                double hourlyRate = rs.getDouble("HourlyRate");
+
+	                Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> {
+	                	Instructor newInstructor = new Instructor();
+	                    newInstructor.setId(instructorId);
+	                    newInstructor.setLastname(lastname);
+	                    newInstructor.setFirstname(firstname);
+	                    newInstructor.setAge(age);
+	                    newInstructor.setAddress(address);
+	                    newInstructor.setEmail(email);
+	                    newInstructor.setHourlyRate(hourlyRate);
+	                    newInstructor.setAccreditationList(new ArrayList<>());
+	                    return newInstructor;
+	                });
+	                instructor.addAccreditation(accreditation);
+	            }
+	            Instructor.filterInstructorsWithAccreditations(instructorMap, instructors);
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return instructors;
 	}
+
 	
 	public boolean createInstructorAccreditation(int instructorId, int accreditationId, String level) {
 		String sql = "INSERT INTO InstructorAccreditation (InstructorId_FK, AccreditationId_FK, Level) VALUES (?, ?, ?)";

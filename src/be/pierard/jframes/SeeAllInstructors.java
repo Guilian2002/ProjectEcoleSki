@@ -66,6 +66,9 @@ public class SeeAllInstructors extends JFrame {
         JButton btnUpdateInstructor = new JButton("Update Instructor");
         contentPane.add(btnUpdateInstructor, BorderLayout.EAST);
 
+        JButton btnShowDetails = new JButton("Show Details");
+        contentPane.add(btnShowDetails, BorderLayout.WEST);
+
         InstructorDAO instructorDAO = new InstructorDAO(EcoleSkiConnection.getInstance());
         instructorsList = Instructor.findAllInstructor(instructorDAO);
         populateTable(instructorsList);
@@ -105,11 +108,25 @@ public class SeeAllInstructors extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow != -1) {
-                	dispose();
+                    dispose();
                     Instructor selectedInstructor = instructorsList.get(selectedRow);
                     new UpdateInstructor(selectedInstructor).setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select an instructor to update.", "No Instructor Selected",
+                            JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        btnShowDetails.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    Instructor selectedInstructor = instructorsList.get(selectedRow);
+                    JOptionPane.showMessageDialog(null, selectedInstructor.toString(), "Instructor Details", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please select an instructor to view details.", "No Instructor Selected",
                     		JOptionPane.WARNING_MESSAGE);
                 }
             }

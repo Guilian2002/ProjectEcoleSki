@@ -14,6 +14,7 @@ public abstract class Person {
 	private String email;
 	
 	//CTOR
+	public Person() {}
 	public Person(int id, String lastname, String firstname, int age, String address, String email) {
 	    this.id = id;
 	    this.lastname = validateString(lastname, "lastname");
