@@ -46,6 +46,7 @@ public class Home extends JFrame {
         JLabel lblTitle = new JLabel("Welcome to the Ski Management System", JLabel.CENTER);
         lblTitle.setFont(new Font("Arial", Font.BOLD, 24));
         contentPane.add(lblTitle, BorderLayout.NORTH);
+
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -106,7 +107,7 @@ public class Home extends JFrame {
             }
         });
         panelPeriod.add(btnAddPeriod, periodGbc);
-        
+
         periodGbc.gridy = 1;
         JButton btnShowAllPeriods = new JButton("Show All Periods");
         btnShowAllPeriods.setFont(new Font("Arial", Font.PLAIN, 18));
@@ -117,5 +118,27 @@ public class Home extends JFrame {
             }
         });
         panelPeriod.add(btnShowAllPeriods, periodGbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        JPanel panelInstructor = new JPanel();
+        panelInstructor.setBorder(BorderFactory.createTitledBorder("Instructor"));
+        panelInstructor.setLayout(new GridBagLayout());
+        mainPanel.add(panelInstructor, gbc);
+
+        GridBagConstraints instructorGbc = new GridBagConstraints();
+        instructorGbc.insets = new Insets(10, 10, 10, 10);
+        instructorGbc.gridx = 0;
+        instructorGbc.gridy = 0;
+        
+        JButton btnAddInstructor = new JButton("Add an Instructor");
+        btnAddInstructor.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnAddInstructor.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new AddInstructor().setVisible(true);
+            }
+        });
+        panelInstructor.add(btnAddInstructor, instructorGbc);
     }
 }
