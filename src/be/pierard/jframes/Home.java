@@ -53,6 +53,7 @@ public class Home extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
         contentPane.add(mainPanel, BorderLayout.CENTER);
 
+        // Skier Panel
         JPanel panelSkier = new JPanel();
         panelSkier.setBorder(BorderFactory.createTitledBorder("Skier"));
         panelSkier.setLayout(new GridBagLayout());
@@ -84,6 +85,7 @@ public class Home extends JFrame {
         });
         panelSkier.add(btnShowAllSkiers, skierGbc);
 
+        // Period Panel
         gbc.gridx = 1;
         gbc.gridy = 0;
         JPanel panelPeriod = new JPanel();
@@ -117,6 +119,7 @@ public class Home extends JFrame {
         });
         panelPeriod.add(btnShowAllPeriods, periodGbc);
 
+        // Instructor Panel
         gbc.gridx = 0;
         gbc.gridy = 1;
         JPanel panelInstructor = new JPanel();
@@ -150,6 +153,7 @@ public class Home extends JFrame {
         });
         panelInstructor.add(btnShowAllInstructors, instructorGbc);
 
+        // Lesson Panel
         gbc.gridx = 1;
         gbc.gridy = 1;
         JPanel panelLesson = new JPanel();
@@ -182,5 +186,28 @@ public class Home extends JFrame {
             }
         });
         panelLesson.add(btnSeeAllLessons, lessonGbc);
+
+        // Booking Panel - Ajout du cadre pour les réservations
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        JPanel panelBooking = new JPanel();
+        panelBooking.setBorder(BorderFactory.createTitledBorder("Booking"));
+        panelBooking.setLayout(new GridBagLayout());
+        mainPanel.add(panelBooking, gbc);
+
+        GridBagConstraints bookingGbc = new GridBagConstraints();
+        bookingGbc.insets = new Insets(10, 10, 10, 10);
+        bookingGbc.gridx = 0;
+        bookingGbc.gridy = 0;
+
+        JButton btnShowAllBookings = new JButton("Show All Bookings");
+        btnShowAllBookings.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnShowAllBookings.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new SeeAllBookings().setVisible(true);
+            }
+        });
+        panelBooking.add(btnShowAllBookings, bookingGbc);
     }
 }
