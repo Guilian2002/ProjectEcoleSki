@@ -32,17 +32,7 @@ public class PeriodDAO extends DAO<Period>{
 	}
 	
 	public boolean update(Period obj){
-		String sql = "UPDATE Period SET StartDate = ?, EndDate = ?, IsVacation = ? WHERE PeriodId = ?";
-        try (PreparedStatement stmt = connect.prepareStatement(sql)) {
-            stmt.setDate(1, Date.valueOf(obj.getStartDate()));
-            stmt.setDate(2, Date.valueOf(obj.getEndDate()));
-            stmt.setBoolean(3, obj.isVacation());
-            stmt.setInt(4, obj.getId());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+		return false;
 	}
 	
 	public Period find(int id){

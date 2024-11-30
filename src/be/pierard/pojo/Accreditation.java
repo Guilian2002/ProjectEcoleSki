@@ -113,14 +113,6 @@ public class Accreditation {
 		return accreditation;
 	}
 	
-	public boolean createAccreditation(AccreditationDAO accreditationDAO) {
-		return accreditationDAO.create(this);
-	}
-	
-	public boolean updateAccreditation(AccreditationDAO accreditationDAO) {
-		return accreditationDAO.update(this);
-	}
-	
 	public static ArrayList<Accreditation> findAllAccreditation(AccreditationDAO accreditationDAO){
 		return accreditationDAO.findAll();
 	}

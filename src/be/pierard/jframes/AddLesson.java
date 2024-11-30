@@ -227,7 +227,7 @@ public class AddLesson extends JFrame {
             }
 
             Lesson newLesson = new Lesson(0, 0, 0, selectedSchedule, lessonType, selectedInstructor);
-            boolean success = newLesson.makeLesson(lessonDAO, false);
+            boolean success = newLesson.makeLesson(lessonDAO);
 
             if (success) {
                 lblMessage.setText("Lesson added successfully!");

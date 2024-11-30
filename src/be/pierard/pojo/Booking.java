@@ -196,7 +196,7 @@ public class Booking {
 		return lesson.isBookingValidForLesson(this) && instructor.isAvailable(period, lesson) && this.isSpecialCanBookForLater();
 	}
 	
-	public boolean makeBooking(BookingDAO bookingDAO, boolean isUpdate) {
+	public boolean makeBooking(BookingDAO bookingDAO) {
 		if (!dataVerification()) {
 	        JOptionPane.showMessageDialog(null, "Error: Invalid booking data. Please check and try again.",
 	                "Data Validation Error", JOptionPane.ERROR_MESSAGE);
@@ -205,24 +205,13 @@ public class Booking {
 		this.setPrice(this.calculatePrice());
 		this.setDuration(period.getNumberOfDays());
 		this.setDate(LocalDate.now());
-		if(isUpdate) {
-		    if (!updateBooking(bookingDAO)) {
-		        JOptionPane.showMessageDialog(null, "Error: Failed to save booking data to the database.",
-		                "Database Error", JOptionPane.ERROR_MESSAGE);
-		        return false;
-		    }
-		    JOptionPane.showMessageDialog(null, "Success: Booking has been successfully updated!",
-		            "Operation Successful", JOptionPane.INFORMATION_MESSAGE);
+		if (!createBooking(bookingDAO)) {
+			JOptionPane.showMessageDialog(null, "Error: Failed to save booking data to the database.",
+					"Database Error", JOptionPane.ERROR_MESSAGE);
+			return false;
 		}
-		else {
-		    if (!createBooking(bookingDAO)) {
-		        JOptionPane.showMessageDialog(null, "Error: Failed to save booking data to the database.",
-		                "Database Error", JOptionPane.ERROR_MESSAGE);
-		        return false;
-		    }
-		    JOptionPane.showMessageDialog(null, "Success: Booking has been successfully created!",
-		            "Operation Successful", JOptionPane.INFORMATION_MESSAGE);
-		}
+		JOptionPane.showMessageDialog(null, "Success: Booking has been successfully created!",
+			"Operation Successful", JOptionPane.INFORMATION_MESSAGE);
 		return true;
 	}
 	
@@ -261,10 +250,6 @@ public class Booking {
 	//DAO methods
 	public boolean createBooking(BookingDAO bookingDAO) {
 		return bookingDAO.create(this);
-	}
-	
-	public boolean updateBooking(BookingDAO bookingDAO) {
-		return bookingDAO.update(this);
 	}
 	
 	public static ArrayList<Booking> findAllBookings(BookingDAO bookingDAO){

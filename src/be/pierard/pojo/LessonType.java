@@ -3,7 +3,6 @@ package be.pierard.pojo;
 import java.util.ArrayList;
 import java.util.Objects;
 import javax.swing.JOptionPane;
-import be.pierard.dao.LessonTypeDAO;
 
 public class LessonType {
 	private int id;
@@ -98,19 +97,6 @@ public class LessonType {
 	//Business methods
 	public String getFullLevel() {
 		return accreditation.getName()+ " " + level;
-	}
-	
-	//DAO methods
-	public boolean createLessonType(LessonTypeDAO lessonTypeDAO) {
-		return lessonTypeDAO.create(this);
-	}
-	
-	public boolean updateLessonType(LessonTypeDAO lessonTypeDAO) {
-		return lessonTypeDAO.update(this);
-	}
-	
-	public static ArrayList<LessonType> findAllLessonType(LessonTypeDAO lessonTypeDAO){
-		return lessonTypeDAO.findAll();
 	}
 
 	//Usual methods

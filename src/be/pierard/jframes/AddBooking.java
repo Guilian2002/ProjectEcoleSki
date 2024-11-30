@@ -250,7 +250,7 @@ public class AddBooking extends JFrame {
             int groupSize = Integer.parseInt(groupSizeStr);
 
             Booking newBooking = new Booking(0, null, 0, 0.0, groupSize, false, lesson.getInstructor(), lesson, selectedPeriod, selectedSkier);
-            boolean success = newBooking.makeBooking(new BookingDAO(EcoleSkiConnection.getInstance()), false);
+            boolean success = newBooking.makeBooking(new BookingDAO(EcoleSkiConnection.getInstance()));
 
             if (success) {
                 lblMessage.setText("Booking added successfully!");

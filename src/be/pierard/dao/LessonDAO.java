@@ -35,20 +35,7 @@ public class LessonDAO extends DAO<Lesson>{
 	}
 	
 	public boolean update(Lesson obj){
-		String sql = "UPDATE Lesson SET MinBookings = ?, MaxBookings = ?, Schedule = ?, InstructorId_FK = ?, LessonTypeId_FK = ?"
-				+ " WHERE LessonId = ?";
-        try (PreparedStatement stmt = connect.prepareStatement(sql)) {
-            stmt.setInt(1, obj.getMinBookings());
-            stmt.setInt(2, obj.getMaxBookings());
-            stmt.setString(3, obj.getSchedule());
-            stmt.setInt(4, obj.getInstructor().getId());
-            stmt.setInt(5, obj.getLessonType().getId());
-            stmt.setInt(6, obj.getId());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+		return false;
 	}
 	
 	public Lesson find(int id){

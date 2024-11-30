@@ -16,14 +16,7 @@ public class AccreditationDAO extends DAO<Accreditation>{
 	}
 	
 	public boolean create(Accreditation obj){		
-		String sql = "INSERT INTO Accreditation (AccreditationName) VALUES (?)";
-        try (PreparedStatement stmt = connect.prepareStatement(sql)) {
-            stmt.setString(1, obj.getName());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+		return false;
 	}
 	
 	public boolean delete(Accreditation obj){
@@ -31,15 +24,7 @@ public class AccreditationDAO extends DAO<Accreditation>{
 	}
 	
 	public boolean update(Accreditation obj){
-		String sql = "UPDATE Accreditation SET AccreditationName = ? WHERE AccreditationId = ?";
-        try (PreparedStatement stmt = connect.prepareStatement(sql)) {
-            stmt.setString(1, obj.getName());
-            stmt.setInt(2, obj.getId());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+		return false;
 	}
 	
 	public Accreditation find(int id){

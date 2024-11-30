@@ -2,9 +2,6 @@ package be.pierard.pojo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import javax.swing.JOptionPane;
 import be.pierard.dao.LessonDAO;
@@ -156,7 +153,7 @@ public class Lesson {
 	    		&& (booking.getSkier().getLevel().contains(this.lessonType.getAccreditation().getName())));
 	}
 	
-	public boolean makeLesson(LessonDAO lessonDAO, boolean isUpdate) {
+	public boolean makeLesson(LessonDAO lessonDAO) {
 		if (!isInstructorQualified()) {
 	       JOptionPane.showMessageDialog(
 	           null,
@@ -171,43 +168,18 @@ public class Lesson {
 		else
 	    	makeCollectif();
 	    
-		if(isUpdate) {
-			if (!updateLesson(lessonDAO)) {
-		       JOptionPane.showMessageDialog(null, "Error: Failed to save lesson data to the database.",
-		               "Database Error", JOptionPane.ERROR_MESSAGE);
-		       return false;
-			}
-			JOptionPane.showMessageDialog(
-				null,
-				"Success: The lesson has been successfully updated.",
-				"Operation Successful",
-				JOptionPane.INFORMATION_MESSAGE
-			);
+		if (!createLesson(lessonDAO)) {
+	       JOptionPane.showMessageDialog(null, "Error: Failed to save lesson data to the database.",
+	               "Database Error", JOptionPane.ERROR_MESSAGE);
+	       return false;
 		}
-		else {
-			if (!createLesson(lessonDAO)) {
-		       JOptionPane.showMessageDialog(null, "Error: Failed to save lesson data to the database.",
-		               "Database Error", JOptionPane.ERROR_MESSAGE);
-		       return false;
-			}
-			JOptionPane.showMessageDialog(
-				null,
-				"Success: The lesson has been successfully created.",
-				"Operation Successful",
-				JOptionPane.INFORMATION_MESSAGE
-			);
-		}
+		JOptionPane.showMessageDialog(
+			null,
+			"Success: The lesson has been successfully created.",
+			"Operation Successful",
+			JOptionPane.INFORMATION_MESSAGE
+		);
 		return true;
-	}
-	
-	public static void addLessonsToInstructors(ArrayList<Lesson> lessonList) {
-		Map<Instructor, List<Lesson>> instructorBookings = new HashMap<>();
-
-	    for (Lesson lesson : lessonList) {
-	        instructorBookings
-	            .computeIfAbsent(lesson.getInstructor(), k -> lesson.getInstructor().getLessonList())
-	            .add(lesson);
-	    }
 	}
 	
 	public void addBooking(Booking booking) {
@@ -250,10 +222,6 @@ public class Lesson {
 	//DAO methods
 	public boolean createLesson(LessonDAO lessonDAO) {
 		return lessonDAO.create(this);
-	}
-	
-	public boolean updateLesson(LessonDAO lessonDAO) {
-		return lessonDAO.update(this);
 	}
 	
 	public static ArrayList<Lesson> findAllLesson(LessonDAO lessonDAO){

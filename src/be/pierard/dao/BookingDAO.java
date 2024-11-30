@@ -41,23 +41,7 @@ public class BookingDAO extends DAO<Booking>{
 	}
 	
 	public boolean update(Booking obj){
-		String sql = "UPDATE Booking SET BookingDate = ?, Duration = ?, Price = ?, GroupSize = ?, IsSpecial = ?, LessonId_FK = ?,"
-				+ " SkierId_FK = ?, PeriodId_FK = ? WHERE BookingId = ?";
-        try (PreparedStatement stmt = connect.prepareStatement(sql)) {
-            stmt.setDate(1, Date.valueOf(obj.getDate()));
-            stmt.setInt(2, obj.getDuration());
-            stmt.setDouble(3, obj.getPrice());
-            stmt.setInt(4, obj.getGroupSize());
-            stmt.setBoolean(5, obj.isSpecial());
-            stmt.setInt(6, obj.getLesson().getId());
-            stmt.setInt(7, obj.getSkier().getId());
-            stmt.setInt(8, obj.getPeriod().getId());
-            stmt.setInt(9, obj.getId());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return false;
 	}
 	
 	public Booking find(int id){
