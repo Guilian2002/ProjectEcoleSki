@@ -13,6 +13,7 @@ public class Skier extends Person {
 	private ArrayList<Booking> bookingList;
 	
 	//CTOR
+	public Skier() {}
 	public Skier(int id, String lastname, String firstname, int age, String address, String email, boolean insurance,
 			String level) {
 		super(id, lastname, firstname, age, address, email);
@@ -62,6 +63,12 @@ public class Skier extends Person {
 	public String getRole() {
 		return "Skier";
 	}
+	
+	public void addBooking(Booking booking) {
+        if (!bookingList.contains(booking)) {
+        	bookingList.add(booking);
+        }
+    }
 	
 	public boolean makeSkier(SkierDAO skierDAO, boolean isUpdate) {
 	    if (!dataVerification()) {

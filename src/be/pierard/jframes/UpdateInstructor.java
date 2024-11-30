@@ -30,6 +30,7 @@ public class UpdateInstructor extends JFrame {
             }
         });
     }
+    
     public UpdateInstructor(Instructor instructor) {
         if (instructor == null) {
             dispose();

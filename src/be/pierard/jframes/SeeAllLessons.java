@@ -74,6 +74,11 @@ public class SeeAllLessons extends JFrame {
         });
         buttonPanel.add(btnGoBack);
 
+        JButton btnAddBooking = new JButton("Add a Booking");
+        btnAddBooking.setFont(new Font("Arial", Font.PLAIN, 16));
+        btnAddBooking.addActionListener(e -> openAddBooking());
+        buttonPanel.add(btnAddBooking);
+
         updateTable(lessons);
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -92,6 +97,8 @@ public class SeeAllLessons extends JFrame {
                 filterLessons();
             }
         });
+
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     private void updateTable(ArrayList<Lesson> lessons) {
@@ -122,5 +129,16 @@ public class SeeAllLessons extends JFrame {
         }
 
         updateTable(filteredLessons);
+    }
+
+    private void openAddBooking() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow != -1) {
+            Lesson selectedLesson = lessons.get(selectedRow);
+            dispose();
+            new AddBooking(selectedLesson).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select a lesson first.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
