@@ -17,6 +17,7 @@ public class Period {
 	private ArrayList<Booking> bookingList;
 	
 	//CTOR
+	public Period() {}
 	public Period(int id, LocalDate startDate, LocalDate endDate, boolean isVacation, ArrayList<Booking> bookingList) {
 		this.id = id;
 		this.startDate = startDate;
@@ -90,6 +91,12 @@ public class Period {
         vacationPeriods.add(new Period(3, LocalDate.of(2025, 4, 12), LocalDate.of(2025, 4, 26), true));
         return vacationPeriods.stream()
                 .anyMatch(period -> !date.isBefore(period.getStartDate()) && !date.isAfter(period.getEndDate()));
+    }
+	
+	public void addBooking(Booking booking) {
+        if (!bookingList.contains(booking)) {
+        	bookingList.add(booking);
+        }
     }
 	
 	public boolean makePeriod(PeriodDAO periodDAO) {
@@ -166,14 +173,14 @@ public class Period {
 	}
 
 	public boolean isWithinOneWeek() {
-		LocalDate currentDate = LocalDate.now();
+	    LocalDate currentDate = LocalDate.now();
 	    LocalDate oneWeekLater = currentDate.plusWeeks(1);
-	    return this.getStartDate().isBefore(oneWeekLater);
+	    return !this.getStartDate().isAfter(oneWeekLater);
 	}
 
 	public boolean isWithinOneMonth() {
-		LocalDate currentDate = LocalDate.now();
+	    LocalDate currentDate = LocalDate.now();
 	    LocalDate oneMonthLater = currentDate.plusMonths(1);
-	    return this.getStartDate().isBefore(oneMonthLater);
+	    return !this.getStartDate().isAfter(oneMonthLater);
 	}
 }

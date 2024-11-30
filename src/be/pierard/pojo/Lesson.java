@@ -19,6 +19,9 @@ public class Lesson {
 	private ArrayList<Booking> bookingList;
 	
 	//CTOR
+	public Lesson() {
+		this.bookingList = new ArrayList<Booking>();
+	}
 	public Lesson(int id, int minBookings, int maxBookings, String schedule, LessonType lessonType,
 			Instructor instructor, ArrayList<Booking> bookingList) {
 		this.id = id;
@@ -134,9 +137,15 @@ public class Lesson {
 	}
 
 	public int getCurrentBookingsNumber() {
-		int sum = 0;
-		for(Booking booking : bookingList)
-			sum += booking.getGroupSize();
+	    int sum = 0;
+	    if (bookingList != null) {
+	        for (Booking booking : bookingList) {
+	            if (booking.getGroupSize() > 0) {
+	                sum += booking.getGroupSize();
+	            }
+	        }
+	    }
+	    
 	    return sum;
 	}
 
@@ -200,6 +209,12 @@ public class Lesson {
 	            .add(lesson);
 	    }
 	}
+	
+	public void addBooking(Booking booking) {
+        if (!bookingList.contains(booking)) {
+        	bookingList.add(booking);
+        }
+    }
 	
 	private boolean makeCollectif() {
 		String lessonName = this.lessonType.getFullLevel().toLowerCase();

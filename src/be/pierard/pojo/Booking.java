@@ -2,12 +2,7 @@ package be.pierard.pojo;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import javax.swing.JOptionPane;
 import be.pierard.dao.BookingDAO;
 
@@ -24,7 +19,7 @@ public class Booking {
 	private Skier skier;
 	
 	//CTOR
-	public Booking(int id, LocalDate date, int duration, double price, int groupSize, boolean isSpecial,Instructor instructor,
+	public Booking(int id, LocalDate date, int duration, double price, int groupSize, boolean isSpecial, Instructor instructor,
 			Lesson lesson, Period period, Skier skier) {
 		this.id = id;
 		this.date = date;
@@ -164,13 +159,12 @@ public class Booking {
 	    double basePrice = 0.0;
 	    int totalDays = period.getNumberOfDays();
 	    double instructorRate = instructor.getHourlyRate();
-	    int currentBookingNumber = lesson.getCurrentBookingsNumber();
 	    boolean hasInsurance = skier.isInsurance();
 
 	    if (isSpecial()) {
 	        int totalHours = calculateTotalHoursSpecial(totalDays);
 
-	        basePrice = ((totalHours * instructorRate) / currentBookingNumber)
+	        basePrice = ((totalHours * instructorRate) / groupSize)
 	                     + (hasInsurance ? 20 : 0)
 	                     + (totalDays * lesson.getLessonPrice());
 
@@ -180,7 +174,7 @@ public class Booking {
 
 	        basePrice = ((lesson.getLessonPrice() * totalWeeks)
 	                    + (hasInsurance ? 20 : 0)
-	                    + ((totalHours * instructorRate) / currentBookingNumber));
+	                    + ((totalHours * instructorRate) / groupSize));
 
 	        if (lesson.getSchedule().contains("morning+afternoon")) {
 	            basePrice /= 0.85;
@@ -191,36 +185,15 @@ public class Booking {
 	        basePrice *= 1.2;
 	    }
 
-	    return basePrice;
+	    return Math.round(basePrice * 10.0) / 10.0;
 	}
 	
 	public boolean dataVerification() {
+	    if(lesson.getMinBookings() == 1 && lesson.getMaxBookings() == 4)
+	    	setSpecial(true);
+	    else
+	    	setSpecial(false);
 		return lesson.isBookingValidForLesson(this) && instructor.isAvailable(period, lesson) && this.isSpecialCanBookForLater();
-	}
-	
-	public static void addBookingsToObjects(ArrayList<Booking> bookingList) {
-		Map<Instructor, List<Booking>> instructorBookings = new HashMap<>();
-	    Map<Skier, List<Booking>> skierBookings = new HashMap<>();
-	    Map<Lesson, List<Booking>> lessonBookings = new HashMap<>();
-	    Map<Period, List<Booking>> periodBookings = new HashMap<>();
-
-	    for (Booking booking : bookingList) {
-	        instructorBookings
-	            .computeIfAbsent(booking.getInstructor(), k -> booking.getInstructor().getBookingList())
-	            .add(booking);
-
-	        skierBookings
-	            .computeIfAbsent(booking.getSkier(), k -> booking.getSkier().getBookingList())
-	            .add(booking);
-
-	        lessonBookings
-	            .computeIfAbsent(booking.getLesson(), k -> booking.getLesson().getBookingList())
-	            .add(booking);
-
-	        periodBookings
-	            .computeIfAbsent(booking.getPeriod(), k -> booking.getPeriod().getBookingList())
-	            .add(booking);
-	    }
 	}
 	
 	public boolean makeBooking(BookingDAO bookingDAO, boolean isUpdate) {
@@ -296,16 +269,6 @@ public class Booking {
 	
 	public static ArrayList<Booking> findAllBookings(BookingDAO bookingDAO){
 		return bookingDAO.findAll();
-	}
-	
-	public static void linkEntities(ArrayList<Booking> bookingList) {
-	    addBookingsToObjects(bookingList);
-	    Set<Lesson> lessonSet = new HashSet<>();
-	    for (Booking booking : bookingList) {
-	        lessonSet.add(booking.getLesson());
-	    }
-	    ArrayList<Lesson> lessonList = new ArrayList<>(lessonSet);
-	    Lesson.addLessonsToInstructors(lessonList);
 	}
 	
 	//Usual methods

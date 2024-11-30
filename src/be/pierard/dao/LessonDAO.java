@@ -56,64 +56,130 @@ public class LessonDAO extends DAO<Lesson>{
 
 	public ArrayList<Lesson> findAll() {
 	    ArrayList<Lesson> lessonList = new ArrayList<>();
-	    String sql = "SELECT l.*, lt.*, i.*, a.* " +
+	    Map<Integer, Lesson> lessonMap = new HashMap<>();
+	    Map<Integer, Instructor> instructorMap = new HashMap<>();
+	    Map<Integer, LessonType> lessonTypeMap = new HashMap<>();
+
+	    String sql = "SELECT l.LessonId, l.MinBookings, l.MaxBookings, l.Schedule, " +
+	                 "lt.LessonTypeId, lt.Level, lt.Price, " +
+	                 "a.AccreditationId, a.AccreditationName, " +
+	                 "i.InstructorId, i.Lastname AS InstructorLastname, i.Firstname AS InstructorFirstname, i.Age AS InstructorAge, " +
+	                 "i.Address AS InstructorAddress, i.Email AS InstructorEmail, i.HourlyRate, " +
+	                 "b.BookingId, b.BookingDate, b.Duration, b.Price AS BookingPrice, b.GroupSize, b.IsSpecial, " +
+	                 "s.SkierId, s.Lastname AS SkierLastname, s.Firstname AS SkierFirstname, s.Age AS SkierAge, " +
+	                 "s.Address AS SkierAddress, s.Email AS SkierEmail, s.Insurance, s.Level AS SkierLevel, " +
+	                 "p.PeriodId, p.StartDate, p.EndDate, p.IsVacation " +
 	                 "FROM Lesson l " +
 	                 "INNER JOIN Instructor i ON l.InstructorId_FK = i.InstructorId " +
 	                 "INNER JOIN LessonType lt ON l.LessonTypeId_FK = lt.LessonTypeId " +
-	                 "INNER JOIN Accreditation a ON lt.AccreditationId_FK = a.AccreditationId ";
+	                 "INNER JOIN Accreditation a ON lt.AccreditationId_FK = a.AccreditationId " +
+	                 "LEFT JOIN Booking b ON b.LessonId_FK = l.LessonId " +
+	                 "LEFT JOIN Skier s ON s.SkierId = b.SkierId_FK " +
+	                 "LEFT JOIN Period p ON p.PeriodId = b.PeriodId_FK";
 
 	    try (PreparedStatement stmt = connect.prepareStatement(sql);
 	         ResultSet rs = stmt.executeQuery()) {
 
-	        Map<Integer, Instructor> instructorMap = new HashMap<>();
-
 	        while (rs.next()) {
 	            int lessonId = rs.getInt("LessonId");
-	            int minBookings = rs.getInt("MinBookings");
-	            int maxBookings = rs.getInt("MaxBookings");
-	            String schedule = rs.getString("Schedule");
+                int minBookings = rs.getInt("MinBookings");
+                int maxBookings = rs.getInt("MaxBookings");
+                String schedule = rs.getString("Schedule");
+                
+                int lessonTypeId = rs.getInt("LessonTypeId");
+                String lessonTypeLevel = rs.getString("Level");
+                double lessonTypePrice = rs.getDouble("Price");
+                
+                int accreditationId = rs.getInt("AccreditationId");
+                String accreditationName = rs.getString("AccreditationName");
+                
+                int instructorId = rs.getInt("InstructorId");
+                String instructorLastname = rs.getString("InstructorLastname");
+                String instructorFirstname = rs.getString("InstructorFirstname");
+                int instructorAge = rs.getInt("InstructorAge");
+                String instructorAddress = rs.getString("InstructorAddress");
+                String instructorEmail = rs.getString("InstructorEmail");
+                double instructorHourlyRate = rs.getDouble("HourlyRate");
+                
+	            Lesson lesson = lessonMap.computeIfAbsent(lessonId, id -> {
+	                LessonType lessonType = lessonTypeMap.computeIfAbsent(lessonTypeId, ltId -> {
+	                    LessonType lt = new LessonType();
+	                    lt.setId(lessonTypeId);
+	                    lt.setLevel(lessonTypeLevel);
+	                    lt.setPrice(lessonTypePrice);
+	                    ArrayList<LessonType> lessonTypeList = new ArrayList<LessonType>();
+	                    lessonTypeList.add(lt);
+	                    Accreditation accreditation = new Accreditation(accreditationId, accreditationName, lessonTypeList);
+	                    lt.setAccreditation(accreditation);
+	                    return lt;
+	                });
 
-	            LessonType lessonType = new LessonType();
-	            lessonType.setId(rs.getInt("LessonTypeId"));
-	            lessonType.setLevel(rs.getString("Level"));
-	            lessonType.setPrice(rs.getDouble("Price"));
+	                Instructor instructor = instructorMap.computeIfAbsent(instructorId, instId -> {
+	                    Instructor inst = new Instructor();
+	                    inst.setId(instructorId);
+	                    inst.setLastname(instructorLastname);
+	                    inst.setFirstname(instructorFirstname);
+	                    inst.setAge(instructorAge);
+	                    inst.setAddress(instructorAddress);
+	                    inst.setEmail(instructorEmail);
+	                    inst.setHourlyRate(instructorHourlyRate);
+	                    return inst;
+	                });
 
-	            ArrayList<LessonType> lessonTypeList = new ArrayList<>();
-	            lessonTypeList.add(lessonType);
-	            Accreditation accreditation = new Accreditation(rs.getInt("AccreditationId"), rs.getString("AccreditationName"), lessonTypeList);
-	            lessonType.setAccreditation(accreditation);
-
-	            int instructorId = rs.getInt("InstructorId");
-	            String lastname = rs.getString("Lastname");
-	            String firstname = rs.getString("Firstname");
-	            int age = rs.getInt("Age");
-	            String address = rs.getString("Address");
-	            String email = rs.getString("Email");
-	            double hourlyRate = rs.getDouble("HourlyRate");
-
-	            Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> {
-	                Instructor newInstructor = new Instructor();
-	                newInstructor.setId(instructorId);
-	                newInstructor.setLastname(lastname);
-	                newInstructor.setFirstname(firstname);
-	                newInstructor.setAge(age);
-	                newInstructor.setAddress(address);
-	                newInstructor.setEmail(email);
-	                newInstructor.setHourlyRate(hourlyRate);
-	                newInstructor.setAccreditationList(new ArrayList<>());
-	                return newInstructor;
+	                Lesson newLesson = new Lesson(lessonId, minBookings, maxBookings, schedule, lessonType, instructor);
+	                newLesson.setBookingList(new ArrayList<>());
+	                return newLesson;
 	            });
+	            
+	            int skierId = rs.getInt("SkierId");
+	            String skierLastname = rs.getString("SkierLastname");
+	            String skierFirstname = rs.getString("SkierFirstname");
+	            int skierAge = rs.getInt("SkierAge");
+	            String skierAddress = rs.getString("SkierAddress");
+	            String skierEmail = rs.getString("SkierEmail");
+	            boolean skierInsurance = rs.getBoolean("Insurance");
+	            String skierLevel = rs.getString("SkierLevel");
 
-	            instructor.addAccreditation(accreditation);
+	            Skier skier = new Skier();
+	            skier.setId(skierId);
+	            skier.setLastname(skierLastname);
+	            skier.setFirstname(skierFirstname);
+	            skier.setAge(skierAge);
+	            skier.setAddress(skierAddress);
+	            skier.setEmail(skierEmail);
+	            skier.setInsurance(skierInsurance);
+	            skier.setLevel(skierLevel);
 
-	            Lesson lesson = new Lesson(lessonId, minBookings, maxBookings, schedule, lessonType, instructor);
+	            Period period = new Period(
+	                rs.getInt("PeriodId"),
+	                rs.getDate("StartDate") != null ? rs.getDate("StartDate").toLocalDate() : null,
+	                rs.getDate("EndDate") != null ? rs.getDate("EndDate").toLocalDate() : null,
+	                rs.getBoolean("IsVacation")
+	            );
 
-	            lessonList.add(lesson);
+	            Booking booking = new Booking(
+	                rs.getInt("BookingId"),
+	                rs.getDate("BookingDate")!= null ? rs.getDate("BookingDate").toLocalDate() : null,
+	                rs.getInt("Duration"),
+	                rs.getDouble("BookingPrice"),
+	                rs.getInt("GroupSize"),
+	                rs.getBoolean("IsSpecial"),
+	                lesson.getInstructor(),
+	                lesson,
+	                period,
+	                skier
+	            );
+
+	            lesson.addBooking(booking);
 	        }
+
+	        lessonList.addAll(lessonMap.values());
+
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
 
 	    return lessonList;
 	}
+
 }

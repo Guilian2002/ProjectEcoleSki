@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.swing.JOptionPane;
+
+import be.pierard.dao.BookingDAO;
+import be.pierard.dao.EcoleSkiConnection;
 import be.pierard.dao.InstructorDAO;
 
 public class Instructor extends Person{
@@ -168,13 +171,17 @@ public class Instructor extends Person{
 	}
 	
 	public boolean isAvailable(Period period, Lesson lesson) {
-	    for (Lesson lessonInstructor : lessonList) {
-	        if (!lesson.equals(lessonInstructor) && 
-	            lesson.getInstructor().equals(lessonInstructor.getInstructor())) {
-	            for (Booking booking : lessonInstructor.getBookingList()) {
-	                if (doPeriodsOverlap(booking.getPeriod(), period)) {
-	                    return false;
-	                }
+	    ArrayList<Booking> allBookings = Booking.findAllBookings(new BookingDAO(EcoleSkiConnection.getInstance()));
+	    for (Booking booking : allBookings) {
+	        Lesson bookedLesson = booking.getLesson();
+	        Instructor bookedInstructor = bookedLesson.getInstructor();
+	        Period bookedPeriod = booking.getPeriod();
+	        if (bookedLesson == null || bookedInstructor == null || bookedPeriod == null) {
+	            return true;
+	        }
+	        if (bookedInstructor.equals(lesson.getInstructor()) && !bookedLesson.equals(lesson)) {
+	            if (doPeriodsOverlap(bookedPeriod, period)) {
+	                return false;
 	            }
 	        }
 	    }
