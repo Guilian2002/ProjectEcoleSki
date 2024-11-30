@@ -35,7 +35,8 @@ public class LessonDAO extends DAO<Lesson>{
 	}
 	
 	public boolean update(Lesson obj){
-		String sql = "UPDATE Lesson SET MinBookings = ?, MaxBookings = ?, Schedule = ?, InstructorId_FK = ?, LessonTypeId_FK = ? WHERE LessonId = ?";
+		String sql = "UPDATE Lesson SET MinBookings = ?, MaxBookings = ?, Schedule = ?, InstructorId_FK = ?, LessonTypeId_FK = ?"
+				+ " WHERE LessonId = ?";
         try (PreparedStatement stmt = connect.prepareStatement(sql)) {
             stmt.setInt(1, obj.getMinBookings());
             stmt.setInt(2, obj.getMaxBookings());

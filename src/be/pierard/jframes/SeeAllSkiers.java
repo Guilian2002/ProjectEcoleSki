@@ -19,7 +19,6 @@ public class SeeAllSkiers extends JFrame {
     private JPanel contentPane;
     private JTable table;
     private JTextField searchField;
-    private SkierDAO skierDAO;
     private ArrayList<Skier> allSkiers;
 
     public static void main(String[] args) {
@@ -36,7 +35,6 @@ public class SeeAllSkiers extends JFrame {
     }
 
     public SeeAllSkiers(SkierDAO skierDAO) {
-        this.skierDAO = skierDAO;
         setTitle("All Skiers");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 800, 400);

@@ -186,8 +186,6 @@ public class Home extends JFrame {
             }
         });
         panelLesson.add(btnSeeAllLessons, lessonGbc);
-
-        // Booking Panel - Ajout du cadre pour les réservations
         gbc.gridx = 0;
         gbc.gridy = 2;
         JPanel panelBooking = new JPanel();
