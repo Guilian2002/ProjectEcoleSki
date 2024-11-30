@@ -142,6 +142,7 @@ public class Accreditation {
 		return id == other.id && Objects.equals(instructorList, other.instructorList)
 				&& Objects.equals(lessonTypeList, other.lessonTypeList) && Objects.equals(name, other.name);
 	}
+	
 	@Override
 	public String toString() {
 		return "Accreditation {" +

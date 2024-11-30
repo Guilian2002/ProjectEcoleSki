@@ -60,17 +60,15 @@ public class InstructorDAO extends DAO<Instructor>{
 
 	public ArrayList<Instructor> findAll() {
 	    ArrayList<Instructor> instructors = new ArrayList<Instructor>();
-	    String sql = "SELECT i.*, a.*, lt.* " +
+	    String sql = "SELECT i.*, ia.*, a.*, lt.* " +
 	                 "FROM Instructor i " +
 	                 "INNER JOIN InstructorAccreditation ia ON i.InstructorId = ia.InstructorId_FK " +
 	                 "INNER JOIN Accreditation a ON ia.AccreditationId_FK = a.AccreditationId " +
-	                 "INNER JOIN LessonType lt ON lt.AccreditationId_FK = a.AccreditationId " +
-	                 "WHERE lt.level = ia.level";
+	    			 "INNER JOIN LessonType lt ON lt.AccreditationId_FK = a.AccreditationId and ia.level = lt.level";
 
 	    try (PreparedStatement stmt = connect.prepareStatement(sql)) {
 	        try (ResultSet rs = stmt.executeQuery()) {
 	            Map<Integer, Instructor> instructorMap = new HashMap<>();
-	            Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 
 	            while (rs.next()) {
 	                LessonType lessonType = new LessonType();
@@ -78,12 +76,11 @@ public class InstructorDAO extends DAO<Instructor>{
 	                lessonType.setLevel(rs.getString("Level"));
 	                lessonType.setPrice(rs.getDouble("Price"));
 
-	                Accreditation accreditation = Accreditation.createIfAbsent(
-	                    accreditationMap, 
-	                    rs.getInt("AccreditationId"), 
-	                    rs.getString("AccreditationName"), 
-	                    lessonType
-	                );
+	                Accreditation accreditation = new Accreditation();
+                    accreditation.setId(rs.getInt("AccreditationId"));
+                    accreditation.setName(rs.getString("AccreditationName"));
+                    accreditation.setLessonTypeList(new ArrayList<LessonType>());
+	                accreditation.addLessonType(lessonType);
 
 	                int instructorId = rs.getInt("InstructorId");
 	                String lastname = rs.getString("Lastname");
@@ -112,7 +109,9 @@ public class InstructorDAO extends DAO<Instructor>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
+	    
+	    Instructor.mergeAccreditations(instructors);
+	    
 	    return instructors;
 	}
 
