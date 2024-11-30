@@ -56,21 +56,16 @@ public class LessonDAO extends DAO<Lesson>{
 
 	public ArrayList<Lesson> findAll() {
 	    ArrayList<Lesson> lessonList = new ArrayList<>();
-	    String sql = "SELECT l.*, lt.*, i.*, a.*, asub.*, ltsub.* " +
+	    String sql = "SELECT l.*, lt.*, i.*, a.* " +
 	                 "FROM Lesson l " +
 	                 "INNER JOIN Instructor i ON l.InstructorId_FK = i.InstructorId " +
 	                 "INNER JOIN LessonType lt ON l.LessonTypeId_FK = lt.LessonTypeId " +
-	                 "INNER JOIN Accreditation a ON lt.AccreditationId_FK = a.AccreditationId " +
-	                 "INNER JOIN InstructorAccreditation ia ON i.InstructorId = ia.InstructorId_FK " +
-	                 "INNER JOIN Accreditation asub ON ia.AccreditationId_FK = asub.AccreditationId " +
-	                 "INNER JOIN LessonType ltsub ON ltsub.AccreditationId_FK = a.AccreditationId " +
-	                 "WHERE ltsub.level = ia.level";
+	                 "INNER JOIN Accreditation a ON lt.AccreditationId_FK = a.AccreditationId ";
 
 	    try (PreparedStatement stmt = connect.prepareStatement(sql);
 	         ResultSet rs = stmt.executeQuery()) {
 
 	        Map<Integer, Instructor> instructorMap = new HashMap<>();
-	        Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 
 	        while (rs.next()) {
 	            int lessonId = rs.getInt("l.LessonId");
@@ -89,21 +84,6 @@ public class LessonDAO extends DAO<Lesson>{
 	            lessonTypeList.add(lessonType);
 	            Accreditation accreditation = new Accreditation(accreditationId, accreditationName, lessonTypeList);
 	            lessonType.setAccreditation(accreditation);
-
-	            LessonType lessonType2 = new LessonType();
-	            lessonType2.setId(rs.getInt("ltsub.LessonTypeId"));
-	            lessonType2.setLevel(rs.getString("ltsub.Level"));
-	            lessonType2.setPrice(rs.getDouble("ltsub.Price"));
-
-	            Accreditation accreditation2 = Accreditation.createIfAbsent(
-	                accreditationMap, 
-	                rs.getInt("asub.AccreditationId"), 
-	                rs.getString("asub.AccreditationName"), 
-	                lessonType
-	            );
-
-	            ArrayList<Accreditation> accreditationList = new ArrayList<>();
-	            accreditationList.add(accreditation2);
 
 	            int instructorId = rs.getInt("i.InstructorId");
 	            String lastname = rs.getString("i.Lastname");
@@ -126,7 +106,7 @@ public class LessonDAO extends DAO<Lesson>{
 	                return newInstructor;
 	            });
 
-	            instructor.addAccreditation(accreditation2);
+	            instructor.addAccreditation(accreditation);
 
 	            Lesson lesson = new Lesson(lessonId, minBookings, maxBookings, schedule, lessonType, instructor);
 
