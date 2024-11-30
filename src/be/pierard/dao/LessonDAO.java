@@ -80,7 +80,7 @@ public class LessonDAO extends DAO<Lesson>{
 
 	            ArrayList<LessonType> lessonTypeList = new ArrayList<>();
 	            lessonTypeList.add(lessonType);
-	            Accreditation accreditation = new Accreditation(rs.getInt("AccreditationId"), rs.getString("Name"), lessonTypeList);
+	            Accreditation accreditation = new Accreditation(rs.getInt("AccreditationId"), rs.getString("AccreditationName"), lessonTypeList);
 	            lessonType.setAccreditation(accreditation);
 
 	            int instructorId = rs.getInt("InstructorId");
