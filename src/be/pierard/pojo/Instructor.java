@@ -202,6 +202,7 @@ public class Instructor extends Person{
 
 	        for (int i = 0; i < accreditations.size(); i++) {
 	            Accreditation acc1 = accreditations.get(i);
+            	acc1.getLessonTypeList().getFirst().setAccreditation(acc1);
 	            boolean merged = false;
 
 	            for (int j = i + 1; j < accreditations.size(); j++) {
