@@ -68,30 +68,28 @@ public class LessonDAO extends DAO<Lesson>{
 	        Map<Integer, Instructor> instructorMap = new HashMap<>();
 
 	        while (rs.next()) {
-	            int lessonId = rs.getInt("l.LessonId");
-	            int minBookings = rs.getInt("l.MinBookings");
-	            int maxBookings = rs.getInt("l.MaxBookings");
-	            String schedule = rs.getString("l.Schedule");
+	            int lessonId = rs.getInt("LessonId");
+	            int minBookings = rs.getInt("MinBookings");
+	            int maxBookings = rs.getInt("MaxBookings");
+	            String schedule = rs.getString("Schedule");
 
 	            LessonType lessonType = new LessonType();
-	            lessonType.setId(rs.getInt("lt.LessonTypeId"));
-	            lessonType.setLevel(rs.getString("lt.Level"));
-	            lessonType.setPrice(rs.getDouble("lt.Price"));
+	            lessonType.setId(rs.getInt("LessonTypeId"));
+	            lessonType.setLevel(rs.getString("Level"));
+	            lessonType.setPrice(rs.getDouble("Price"));
 
-	            int accreditationId = rs.getInt("a.AccreditationId");
-	            String accreditationName = rs.getString("a.Name");
 	            ArrayList<LessonType> lessonTypeList = new ArrayList<>();
 	            lessonTypeList.add(lessonType);
-	            Accreditation accreditation = new Accreditation(accreditationId, accreditationName, lessonTypeList);
+	            Accreditation accreditation = new Accreditation(rs.getInt("AccreditationId"), rs.getString("Name"), lessonTypeList);
 	            lessonType.setAccreditation(accreditation);
 
-	            int instructorId = rs.getInt("i.InstructorId");
-	            String lastname = rs.getString("i.Lastname");
-	            String firstname = rs.getString("i.Firstname");
-	            int age = rs.getInt("i.Age");
-	            String address = rs.getString("i.Address");
-	            String email = rs.getString("i.Email");
-	            double hourlyRate = rs.getDouble("i.HourlyRate");
+	            int instructorId = rs.getInt("InstructorId");
+	            String lastname = rs.getString("Lastname");
+	            String firstname = rs.getString("Firstname");
+	            int age = rs.getInt("Age");
+	            String address = rs.getString("Address");
+	            String email = rs.getString("Email");
+	            double hourlyRate = rs.getDouble("HourlyRate");
 
 	            Instructor instructor = instructorMap.computeIfAbsent(instructorId, id -> {
 	                Instructor newInstructor = new Instructor();

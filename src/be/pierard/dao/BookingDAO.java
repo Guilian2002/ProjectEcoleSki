@@ -85,12 +85,12 @@ public class BookingDAO extends DAO<Booking>{
 	            Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 
 	            while (rs.next()) {
-	                int lessonTypeId = rs.getInt("lt.LessonTypeId");
-	                String lessonLevel = rs.getString("lt.Level");
-	                double lessonPrice = rs.getDouble("lt.Price");
+	                int lessonTypeId = rs.getInt("LessonTypeId");
+	                String lessonLevel = rs.getString("Level");
+	                double lessonPrice = rs.getDouble("Price");
 
-	                int accreditationId = rs.getInt("a.AccreditationId");
-	                String accreditationName = rs.getString("a.AccreditationName");
+	                int accreditationId = rs.getInt("AccreditationId");
+	                String accreditationName = rs.getString("AccreditationName");
 
 	                Accreditation accreditation = accreditationId > 0 ? 
 	                    accreditationMap.computeIfAbsent(accreditationId, id -> new Accreditation(

@@ -180,15 +180,6 @@ public class Instructor extends Person{
 	    }
 	    return true;
 	}
-	
-	
-	public static void filterInstructorsWithAccreditations(Map<Integer, Instructor> instructorMap, ArrayList<Instructor> instructors) {
-	    for (Instructor instructor : instructorMap.values()) {
-	        if (!instructor.getAccreditationList().isEmpty()) {
-	            instructors.add(instructor);
-	        }
-	    }
-	}
 
 	private boolean doPeriodsOverlap(Period period1, Period period2) {
 	    return (period1.getStartDate().isBefore(period2.getEndDate()) && 
@@ -196,6 +187,44 @@ public class Instructor extends Person{
 	}
 
 	//DAO methods
+	public static void filterInstructorsWithAccreditations(Map<Integer, Instructor> instructorMap, ArrayList<Instructor> instructors) {
+	    for (Instructor instructor : instructorMap.values()) {
+	        if (!instructor.getAccreditationList().isEmpty()) {
+	            instructors.add(instructor);
+	        }
+	    }
+	}
+	
+	public static void mergeAccreditations(ArrayList<Instructor> instructors) {
+	    for (Instructor instructor : instructors) {
+	        ArrayList<Accreditation> accreditations = instructor.getAccreditationList();
+	        ArrayList<Accreditation> mergedAccreditations = new ArrayList<>();
+
+	        for (int i = 0; i < accreditations.size(); i++) {
+	            Accreditation acc1 = accreditations.get(i);
+	            boolean merged = false;
+
+	            for (int j = i + 1; j < accreditations.size(); j++) {
+	                Accreditation acc2 = accreditations.get(j);
+
+	                if (acc1.getId() == acc2.getId() && acc1.getName().equals(acc2.getName())) {
+	                	acc2.getLessonTypeList().getFirst().setAccreditation(acc1);
+	                	acc1.addLessonType(acc2.getLessonTypeList().getFirst());
+	                    accreditations.remove(j);
+	                    j--;
+	                    merged = true;
+	                }
+	            }
+
+	            if (!merged || !mergedAccreditations.contains(acc1)) {
+	                mergedAccreditations.add(acc1);
+	            }
+	        }
+
+	        instructor.setAccreditationList(mergedAccreditations);
+	    }
+	}
+	
 	public boolean createInstructor(InstructorDAO instructorDAO) {
 		return instructorDAO.create(this);
 	}

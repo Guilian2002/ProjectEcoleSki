@@ -51,8 +51,6 @@ public class Home extends JFrame {
         mainPanel.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
         contentPane.add(mainPanel, BorderLayout.CENTER);
 
         JPanel panelSkier = new JPanel();
@@ -130,7 +128,7 @@ public class Home extends JFrame {
         instructorGbc.insets = new Insets(10, 10, 10, 10);
         instructorGbc.gridx = 0;
         instructorGbc.gridy = 0;
-        
+
         JButton btnAddInstructor = new JButton("Add an Instructor");
         btnAddInstructor.setFont(new Font("Arial", Font.PLAIN, 18));
         btnAddInstructor.addActionListener(new ActionListener() {
@@ -151,5 +149,27 @@ public class Home extends JFrame {
             }
         });
         panelInstructor.add(btnShowAllInstructors, instructorGbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        JPanel panelLesson = new JPanel();
+        panelLesson.setBorder(BorderFactory.createTitledBorder("Lesson"));
+        panelLesson.setLayout(new GridBagLayout());
+        mainPanel.add(panelLesson, gbc);
+
+        GridBagConstraints lessonGbc = new GridBagConstraints();
+        lessonGbc.insets = new Insets(10, 10, 10, 10);
+        lessonGbc.gridx = 0;
+        lessonGbc.gridy = 0;
+
+        JButton btnAddLesson = new JButton("Add a Lesson");
+        btnAddLesson.setFont(new Font("Arial", Font.PLAIN, 18));
+        btnAddLesson.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                new AddLesson().setVisible(true);
+            }
+        });
+        panelLesson.add(btnAddLesson, lessonGbc);
     }
 }

@@ -60,10 +60,11 @@ public class InstructorDAO extends DAO<Instructor>{
 
 	public ArrayList<Instructor> findAll() {
 	    ArrayList<Instructor> instructors = new ArrayList<Instructor>();
-	    String sql = "SELECT i.*, ia.*, a.* " +
+	    String sql = "SELECT i.*, ia.*, a.*, lt.* " +
 	                 "FROM Instructor i " +
 	                 "INNER JOIN InstructorAccreditation ia ON i.InstructorId = ia.InstructorId_FK " +
-	                 "INNER JOIN Accreditation a ON ia.AccreditationId_FK = a.AccreditationId ";
+	                 "INNER JOIN Accreditation a ON ia.AccreditationId_FK = a.AccreditationId " +
+	    			 "INNER JOIN LessonType lt ON lt.AccreditationId_FK = a.AccreditationId and ia.level = lt.level";
 
 	    try (PreparedStatement stmt = connect.prepareStatement(sql)) {
 	        try (ResultSet rs = stmt.executeQuery()) {
@@ -71,9 +72,9 @@ public class InstructorDAO extends DAO<Instructor>{
 
 	            while (rs.next()) {
 	                LessonType lessonType = new LessonType();
-	                lessonType.setId(0);
+	                lessonType.setId(rs.getInt("LessonTypeId"));
 	                lessonType.setLevel(rs.getString("Level"));
-	                lessonType.setPrice(0);
+	                lessonType.setPrice(rs.getDouble("Price"));
 
 	                Accreditation accreditation = new Accreditation();
                     accreditation.setId(rs.getInt("AccreditationId"));
@@ -108,7 +109,9 @@ public class InstructorDAO extends DAO<Instructor>{
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	    }
-
+	    
+	    Instructor.mergeAccreditations(instructors);
+	    
 	    return instructors;
 	}
 
