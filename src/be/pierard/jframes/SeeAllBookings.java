@@ -29,9 +29,6 @@ public class SeeAllBookings extends JFrame {
     private ArrayList<Booking> allBookings;
     private TableRowSorter<DefaultTableModel> rowSorter;
 
-    /**
-     * Launch the application.
-     */
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -45,9 +42,6 @@ public class SeeAllBookings extends JFrame {
         });
     }
 
-    /**
-     * Create the frame.
-     */
     public SeeAllBookings() {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 930, 600);

@@ -18,7 +18,6 @@ public class UpdateInstructor extends JFrame {
     private JTextField txtAge;
     private JTextField txtAddress;
     private JTextField txtEmail;
-    private Instructor instructor;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
@@ -37,8 +36,6 @@ public class UpdateInstructor extends JFrame {
             new SeeAllInstructors().setVisible(true);
             return;
         }
-
-        this.instructor = instructor;
 
         setTitle("Update Instructor");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

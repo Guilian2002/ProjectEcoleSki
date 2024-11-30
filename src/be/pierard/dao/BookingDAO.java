@@ -41,7 +41,8 @@ public class BookingDAO extends DAO<Booking>{
 	}
 	
 	public boolean update(Booking obj){
-		String sql = "UPDATE Booking SET BookingDate = ?, Duration = ?, Price = ?, GroupSize = ?, IsSpecial = ?, LessonId_FK = ?, SkierId_FK = ?, PeriodId_FK = ? WHERE BookingId = ?";
+		String sql = "UPDATE Booking SET BookingDate = ?, Duration = ?, Price = ?, GroupSize = ?, IsSpecial = ?, LessonId_FK = ?,"
+				+ " SkierId_FK = ?, PeriodId_FK = ? WHERE BookingId = ?";
         try (PreparedStatement stmt = connect.prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(obj.getDate()));
             stmt.setInt(2, obj.getDuration());
@@ -93,7 +94,6 @@ public class BookingDAO extends DAO<Booking>{
 	        Map<Integer, Accreditation> accreditationMap = new HashMap<>();
 
 	        while (rs.next()) {
-	            // Récupération des données de la base de données et stockage dans des variables
 	            int lessonId = rs.getInt("LessonId");
 	            int minBookings = rs.getInt("MinBookings");
 	            int maxBookings = rs.getInt("MaxBookings");
@@ -114,7 +114,6 @@ public class BookingDAO extends DAO<Booking>{
 	            String instructorEmail = rs.getString("InstructorEmail");
 	            double instructorHourlyRate = rs.getDouble("HourlyRate");
 
-	            // Création ou récupération de l'Instructor
 	            Instructor instructor = instructorMap.computeIfAbsent(instructorId, instId -> {
 	                Instructor inst = new Instructor();
 	                inst.setId(instructorId);
@@ -127,7 +126,6 @@ public class BookingDAO extends DAO<Booking>{
 	                return inst;
 	            });
 
-	            // Création ou récupération du LessonType
 	            LessonType lessonType = lessonTypeMap.computeIfAbsent(lessonTypeId, ltId -> {
 	                LessonType lt = new LessonType();
 	                lt.setId(lessonTypeId);
@@ -136,7 +134,6 @@ public class BookingDAO extends DAO<Booking>{
 	                return lt;
 	            });
 
-	            // Création ou récupération de l'Accreditation
 	            Accreditation accreditation = accreditationMap.computeIfAbsent(accreditationId, accId -> {
 	                Accreditation acc = new Accreditation();
 	                acc.setId(accreditationId);
@@ -144,7 +141,6 @@ public class BookingDAO extends DAO<Booking>{
 	                return acc;
 	            });
 
-	            // Création de la Lesson
 	            Lesson lesson = lessonMap.computeIfAbsent(lessonId, id -> {
 	                Lesson newLesson = new Lesson();
 	                newLesson.setId(lessonId);
@@ -157,7 +153,6 @@ public class BookingDAO extends DAO<Booking>{
 	                return newLesson;
 	            });
 
-	            // Création de l'objet Period
 	            int periodId = rs.getInt("PeriodId");
 	            Period period = periodMap.computeIfAbsent(periodId, id -> {
 	                Period newPeriod = new Period();
@@ -172,7 +167,6 @@ public class BookingDAO extends DAO<Booking>{
 	                return newPeriod;
 	            });
 
-	            // Création de l'objet Skier
 	            int skierId = rs.getInt("SkierId");
 	            Skier skier = skierMap.computeIfAbsent(skierId, id -> {
 	                Skier newSkier = new Skier();
@@ -191,7 +185,6 @@ public class BookingDAO extends DAO<Booking>{
 	                return newSkier;
 	            });
 
-	            // Création de la réservation (Booking)
 	            Booking booking = new Booking(
 	                rs.getInt("BookingId"),
 	                rs.getDate("BookingDate") != null ? rs.getDate("BookingDate").toLocalDate() : null,
@@ -205,7 +198,6 @@ public class BookingDAO extends DAO<Booking>{
 	                skier
 	            );
 
-	            // Ajouter la réservation à la liste
 	            lesson.addBooking(booking);
 	            bookings.add(booking);
 	        }

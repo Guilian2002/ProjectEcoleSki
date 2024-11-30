@@ -51,9 +51,6 @@ public class AddBooking extends JFrame {
     private JTextField txtGroupSize;
     private Lesson lesson;
 
-	/**
-	 * Launch the application.
-	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -67,9 +64,6 @@ public class AddBooking extends JFrame {
 		});
 	}
 
-	/**
-	 * Create the frame.
-	 */
 	public AddBooking(Lesson lesson) {
 		if (lesson == null) {
             dispose();

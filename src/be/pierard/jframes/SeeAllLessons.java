@@ -123,7 +123,8 @@ public class SeeAllLessons extends JFrame {
                 String.valueOf(lesson.getMaxBookings()).contains(query) ||
                 lesson.getSchedule().toLowerCase().contains(query) ||
                 lesson.getLessonType().getFullLevel().toLowerCase().contains(query) ||
-                (lesson.getInstructor().getFirstname().toLowerCase() + " " + lesson.getInstructor().getLastname().toLowerCase()).contains(query)) {
+                (lesson.getInstructor().getFirstname().toLowerCase() + " " + 
+                lesson.getInstructor().getLastname().toLowerCase()).contains(query)) {
                 filteredLessons.add(lesson);
             }
         }
